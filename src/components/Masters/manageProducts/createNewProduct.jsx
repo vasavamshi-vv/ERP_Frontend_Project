@@ -11,7 +11,7 @@ import NewproductWarehouse from "./newproductWarehouse/newproductWarehouse";
 import NewproductSupplier from "./newproductSupplier/newproductSupplier";
 import NewproductSize from "./newproductSize/newproductSize";
 import NewproductColor from "./newproductColor/newproductColor";
-import axios from "axios";
+import ApiClient from "../../network/api-client";
 
 export default function createNewProduct({
   setshowNewProduct,
@@ -114,7 +114,7 @@ export default function createNewProduct({
 
         const fetchWithErrorHandling = async (url, field) => {
           try {
-            const response = await axios.get(url, { headers });
+            const response = await ApiClient.get(url, { headers });
             return response.data[field] || response.data || [];
           } catch (err) {
             console.error(`Error fetching ${field || url}:`, err);
@@ -133,14 +133,14 @@ export default function createNewProduct({
           suppliers,
           products,
         ] = await Promise.all([
-          fetchWithErrorHandling("http://127.0.0.1:8000/api/categories/", "categories"),
-          fetchWithErrorHandling("http://127.0.0.1:8000/api/tax-codes/", "tax_codes"),
-          fetchWithErrorHandling("http://127.0.0.1:8000/api/uoms/", "uoms"),
-          fetchWithErrorHandling("http://127.0.0.1:8000/api/warehouses/", "warehouses"),
-          fetchWithErrorHandling("http://127.0.0.1:8000/api/sizes/", "sizes"),
-          fetchWithErrorHandling("http://127.0.0.1:8000/api/colors/", "colors"),
-          fetchWithErrorHandling("http://127.0.0.1:8000/api/suppliers/", "suppliers"),
-          fetchWithErrorHandling("http://127.0.0.1:8000/api/products/", "products"),
+          fetchWithErrorHandling("import.meta.env.VITE_API_URL/api/categories/", "categories"),
+          fetchWithErrorHandling("import.meta.env.VITE_API_URL/api/tax-codes/", "tax_codes"),
+          fetchWithErrorHandling("import.meta.env.VITE_API_URL/api/uoms/", "uoms"),
+          fetchWithErrorHandling("import.meta.env.VITE_API_URL/api/warehouses/", "warehouses"),
+          fetchWithErrorHandling("import.meta.env.VITE_API_URL/api/sizes/", "sizes"),
+          fetchWithErrorHandling("import.meta.env.VITE_API_URL/api/colors/", "colors"),
+          fetchWithErrorHandling("import.meta.env.VITE_API_URL/api/suppliers/", "suppliers"),
+          fetchWithErrorHandling("import.meta.env.VITE_API_URL/api/products/", "products"),
         ]);
 
         setcategoryApi(categories);
@@ -291,15 +291,15 @@ export default function createNewProduct({
       let response;
       if (editNewProduct && newProductData.id) {
         // Update existing product
-        response = await axios.put(
-          `http://127.0.0.1:8000/api/products/${newProductData.id}/`,
+        response = await ApiClient.put(
+          `import.meta.env.VITE_API_URL/api/products/${newProductData.id}/`,
           formData,
           { headers }
         );
         toast.success("Product updated successfully");
       } else {
         // Create new product
-        response = await axios.post("http://127.0.0.1:8000/api/products/", formData, { headers });
+        response = await ApiClient.post("import.meta.env.VITE_API_URL/api/products/", formData, { headers });
         toast.success("Product created successfully");
       }
 

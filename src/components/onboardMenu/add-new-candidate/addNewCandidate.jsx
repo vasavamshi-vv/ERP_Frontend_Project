@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import ApiClient from "../../network/api-client";
 import "./addNewCandidate.css";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -72,8 +72,8 @@ export default function AddNewCandidate() {
             return;
           }
 
-          const response = await axios.get(
-            `http://127.0.0.1:8000/api/onboarding/${candidateId}/`,
+          const response = await ApiClient.get(
+            `import.meta.env.VITE_API_URL/api/onboarding/${candidateId}/`,
             {
               headers: {
                 Authorization: `Token ${token}`,
@@ -146,8 +146,8 @@ export default function AddNewCandidate() {
         let totalPages = 1;
 
         do {
-          const response = await axios.get(
-            `http://127.0.0.1:8000/api/departments/?page=${page}`,
+          const response = await ApiClient.get(
+            `import.meta.env.VITE_API_URL/api/departments/?page=${page}`,
             {
               headers: {
                 Authorization: `Token ${token}`,
@@ -163,7 +163,7 @@ export default function AddNewCandidate() {
         } while (page <= totalPages);
 
         // Fetch branches
-        const branchResponse = await axios.get("http://127.0.0.1:8000/api/branches/", {
+        const branchResponse = await ApiClient.get("import.meta.env.VITE_API_URL/api/branches/", {
           headers: {
             Authorization: `Token ${token}`,
             "Content-Type": "application/json",
@@ -200,8 +200,8 @@ export default function AddNewCandidate() {
       }
 
       try {
-        const roleResponse = await axios.get(
-          `http://127.0.0.1:8000/api/roles/?department=${formData.department}`,
+        const roleResponse = await ApiClient.get(
+          `import.meta.env.VITE_API_URL/api/roles/?department=${formData.department}`,
           {
             headers: {
               Authorization: `Token ${token}`,
@@ -324,13 +324,13 @@ export default function AddNewCandidate() {
       };
 
       const response = candidateId
-        ? await axios.put(
-          `http://127.0.0.1:8000/api/onboarding/${candidateId}/`,
+        ? await ApiClient.put(
+          `import.meta.env.VITE_API_URL/api/onboarding/${candidateId}/`,
           formDataToSend,
           config
         )
-        : await axios.post(
-          "http://127.0.0.1:8000/api/onboarding/",
+        : await ApiClient.post(
+          "import.meta.env.VITE_API_URL/api/onboarding/",
           formDataToSend,
           config
         );

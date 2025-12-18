@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./newproductColor.css";
-import axios from "axios";
+import ApiClient from "../../network/api-client";
 import { ToastContainer, toast } from "react-toastify";
 
 export default function NewProductColor({
@@ -27,7 +27,7 @@ export default function NewProductColor({
           toast.error("No authentication token found. Please log in.");
           return;
         }
-        const res = await axios.get("http://127.0.0.1:8000/api/colors/", {
+        const res = await ApiClient.get("import.meta.env.VITE_API_URL/api/colors/", {
           headers: {
             Authorization: `Token ${token}`,
           },
@@ -62,8 +62,8 @@ export default function NewProductColor({
 
       if (newproductColor) {
         // ADD NEW COLOR
-        const res = await axios.post(
-          "http://127.0.0.1:8000/api/colors/",
+        const res = await ApiClient.post(
+          "import.meta.env.VITE_API_URL/api/colors/",
           { name: ColorData.color_name },
           {
             headers: {
@@ -88,8 +88,8 @@ export default function NewProductColor({
           return;
         }
 
-        const res = await axios.put(
-          `http://127.0.0.1:8000/api/colors/${selectedColor.id}/`,
+        const res = await ApiClient.put(
+          `import.meta.env.VITE_API_URL/api/colors/${selectedColor.id}/`,
           { name: ColorData.update_color_name },
           {
             headers: {
@@ -145,7 +145,7 @@ export default function NewProductColor({
         return;
       }
 
-      await axios.delete(`http://127.0.0.1:8000/api/colors/${selectedColor.id}/`, {
+      await ApiClient.delete(`import.meta.env.VITE_API_URL/api/colors/${selectedColor.id}/`, {
         headers: {
           Authorization: `Token ${token}`,
         },

@@ -2,7 +2,7 @@
 // import "./manageUsers.css";
 // import CreateUser from "./createUser";
 // import { toast } from "react-toastify";
-// import axios from "axios";
+// import ApiClient from "../../network/api-client";
 
 // export default function ManageUsers() {
 //   const [manageAPIdata, setmanageAPIdata] = useState({});
@@ -27,7 +27,7 @@
 //       }
 
 //       try {
-//         const response = await axios.get("http://127.0.0.1:8000/api/users/", {
+//         const response = await ApiClient.get("import.meta.env.VITE_API_URL/api/users/", {
 //           headers: {
 //             Authorization: `Token ${token}`,
 //             "Content-Type": "application/json",
@@ -128,7 +128,7 @@
 
 //       try {
 //         const userId = currentData[ind].id;
-//         await axios.delete(`http://127.0.0.1:8000/api/users/${userId}/`, {
+//         await ApiClient.delete(`import.meta.env.VITE_API_URL/api/users/${userId}/`, {
 //           headers: {
 //             Authorization: `Token ${token}`,
 //             "Content-Type": "application/json",

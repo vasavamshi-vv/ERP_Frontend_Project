@@ -356,7 +356,7 @@
 // import "./products.css";
 // import { ToastContainer,  toast } from "react-toastify";
 // import "react-toastify/dist/ReactToastify.css";
-// import axios from "axios";
+// import ApiClient from "../../network/api-client";
 // import CreateNewProduct from "../create-new-product/createNewProduct";
 // import ProductImport from "../productImport/productImport";
 
@@ -397,9 +397,9 @@
 //         const headers = { Authorization: `Token ${token}` };
 
 //         const [productsResponse, categoriesResponse, suppliersResponse] = await Promise.all([
-//           axios.get("http://127.0.0.1:8000/api/products/", { headers }),
-//           axios.get("http://127.0.0.1:8000/api/categories/", { headers }),
-//           axios.get("http://127.0.0.1:8000/api/suppliers/", { headers }),
+//           ApiClient.get("import.meta.env.VITE_API_URL/api/products/", { headers }),
+//           ApiClient.get("import.meta.env.VITE_API_URL/api/categories/", { headers }),
+//           ApiClient.get("import.meta.env.VITE_API_URL/api/suppliers/", { headers }),
 //         ]);
 
 //         const categories = categoriesResponse.data.categories || categoriesResponse.data || [];
@@ -485,7 +485,7 @@
 //           return;
 //         }
 
-//         await axios.delete(`http://127.0.0.1:8000/api/products/${id}/`, {
+//         await ApiClient.delete(`import.meta.env.VITE_API_URL/api/products/${id}/`, {
 //           headers: { Authorization: `Token ${token}` },
 //         });
 
@@ -519,7 +519,7 @@
 //         return;
 //       }
 
-//       const response = await axios.get(`http://127.0.0.1:8000/api/products/${id}/`, {
+//       const response = await ApiClient.get(`import.meta.env.VITE_API_URL/api/products/${id}/`, {
 //         headers: { Authorization: `Token ${token}` },
 //       });
 
@@ -548,7 +548,7 @@
 //         product_usage: productData.product_usage || "",
 //         related_products: productData.related_products || [],
 //         // image: productData.image || "",
-//         image: productData.image ? `http://127.0.0.1:8000/${productData.image}` : "",
+//         image: productData.image ? `import.meta.env.VITE_API_URL/${productData.image}` : "",
 //         sub_category: productData.sub_category || "",
 //         custom_category: productData.is_custom_category ? productData.custom_category : "",
 //         custom_tax_code: productData.is_custom_tax_code ? productData.custom_tax_code : "",

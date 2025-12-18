@@ -1,6 +1,6 @@
 // import React, { useState, useEffect } from "react";
 // import "./newproductCategory.css";
-// import axios from "axios";
+// import ApiClient from "../../network/api-client";
 
 // export default function newproductCategory({
 //   newproductCategory,
@@ -38,8 +38,8 @@
 
 //     if (newproductCategory) {
 //       // ADD NEW CATEGORY
-//       const res = await axios.post(
-//         "http://127.0.0.1:8000/api/categories/",
+//       const res = await ApiClient.post(
+//         "import.meta.env.VITE_API_URL/api/categories/",
 //         { name: CategoryData.category_name },
 //         {
 //           headers: {
@@ -69,8 +69,8 @@
 //         return;
 //       }
 
-//       const res = await axios.put(
-//         `http://127.0.0.1:8000/api/categories/${selectedId}/`,
+//       const res = await ApiClient.put(
+//         `import.meta.env.VITE_API_URL/api/categories/${selectedId}/`,
 //         { name: CategoryData.update_category_name },
 //         {
 //           headers: {
@@ -204,7 +204,7 @@
 
 import React, { useState, useEffect } from "react";
 import "./newproductCategory.css";
-import axios from "axios";
+import ApiClient from "../../network/api-client";
 import { ToastContainer, toast } from "react-toastify";
 
 export default function NewProductCategory({
@@ -231,7 +231,7 @@ export default function NewProductCategory({
           toast.error("No authentication token found. Please log in.");
           return;
         }
-        const res = await axios.get("http://127.0.0.1:8000/api/categories/", {
+        const res = await ApiClient.get("import.meta.env.VITE_API_URL/api/categories/", {
           headers: {
             Authorization: `Token ${token}`,
           },
@@ -266,8 +266,8 @@ export default function NewProductCategory({
 
       if (newproductCategory) {
         // ADD NEW CATEGORY
-        const res = await axios.post(
-          "http://127.0.0.1:8000/api/categories/",
+        const res = await ApiClient.post(
+          "import.meta.env.VITE_API_URL/api/categories/",
           { name: CategoryData.category_name },
           {
             headers: {
@@ -292,8 +292,8 @@ export default function NewProductCategory({
           return;
         }
 
-        const res = await axios.put(
-          `http://127.0.0.1:8000/api/categories/${selectedCategory.id}/`,
+        const res = await ApiClient.put(
+          `import.meta.env.VITE_API_URL/api/categories/${selectedCategory.id}/`,
           { name: CategoryData.update_category_name },
           {
             headers: {
@@ -349,7 +349,7 @@ export default function NewProductCategory({
         return;
       }
 
-      await axios.delete(`http://127.0.0.1:8000/api/categories/${selectedCategory.id}/`, {
+      await ApiClient.delete(`import.meta.env.VITE_API_URL/api/categories/${selectedCategory.id}/`, {
         headers: {
           Authorization: `Token ${token}`,
         },

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./customMaster.css";
 import { toast } from "react-toastify";
-import axios from "axios";
+import ApiClient from "../../network/api-client";
 import CreateNewCustomer from "../create-new-customer/createNewCustomer";
 import CustomImport from "../custom-Import/customImport";
 import CustomDuplicates from "../custom-merge-duplicates/customDuplicates";
@@ -41,7 +41,7 @@ export default function  CustomMaster() {
 
       setIsLoading(true);
       try {
-        const response = await axios.get("http://127.0.0.1:8000/api/customers/", {
+        const response = await ApiClient.get("import.meta.env.VITE_API_URL/api/customers/", {
           headers: {
             Authorization: `Token ${token}`,
             "Content-Type": "application/json",
@@ -102,7 +102,7 @@ export default function  CustomMaster() {
       }
 
       try {
-        const response = await axios.get("http://127.0.0.1:8000/api/customers/summary/", {
+        const response = await ApiClient.get("import.meta.env.VITE_API_URL/api/customers/summary/", {
           headers: {
             Authorization: `Token ${token}`,
             "Content-Type": "application/json",
@@ -149,7 +149,7 @@ export default function  CustomMaster() {
     }
 
     try {
-      await axios.delete(`http://127.0.0.1:8000/api/customers/${id}/`, {
+      await ApiClient.delete(`import.meta.env.VITE_API_URL/api/customers/${id}/`, {
         headers: {
           Authorization: `Token ${token}`,
           "Content-Type": "application/json",
@@ -175,7 +175,7 @@ export default function  CustomMaster() {
     }
 
     try {
-      const response = await axios.get(`http://127.0.0.1:8000/api/customers/${id}/`, {
+      const response = await ApiClient.get(`import.meta.env.VITE_API_URL/api/customers/${id}/`, {
         headers: {
           Authorization: `Token ${token}`,
           "Content-Type": "application/json",

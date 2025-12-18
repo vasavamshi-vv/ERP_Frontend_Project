@@ -1,7 +1,7 @@
 // import React, { useState, useEffect } from "react";
 // import "./createNewCustomer.css";
 // import { toast } from "react-toastify";
-// import axios from "axios";
+// import ApiClient from "../../network/api-client";
 // export default function createNewCoustomer({
 //   setshowAddCustomer,
 //   editShowAddCustom,
@@ -186,7 +186,7 @@
 //         let candidates = [];
 //         let response;
 //         try {
-//           response = await axios.get("http://127.0.0.1:8000/api/onboarding/?department=6", {
+//           response = await ApiClient.get("import.meta.env.VITE_API_URL/api/onboarding/?department=6", {
 //             headers: {
 //               Authorization: `Token ${token}`,
 //               "Content-Type": "application/json",
@@ -194,7 +194,7 @@
 //           });
 //         } catch (error) {
 //           console.warn("Department filter not supported, fetching all candidates:", error);
-//           response = await axios.get("http://127.0.0.1:8000/api/onboarding/", {
+//           response = await ApiClient.get("import.meta.env.VITE_API_URL/api/onboarding/", {
 //             headers: {
 //               Authorization: `Token ${token}`,
 //               "Content-Type": "application/json",
@@ -672,7 +672,7 @@
 import React, { useState, useEffect } from "react";
 import "./createNewCustomer.css";
 import { toast } from "react-toastify";
-import axios from "axios";
+import ApiClient from "../../network/api-client";
 
 export default function CreateNewCustomer({
   setShowAddCustomer,
@@ -730,7 +730,7 @@ export default function CreateNewCustomer({
         let candidates = [];
         let response;
         try {
-          response = await axios.get("http://127.0.0.1:8000/api/onboarding/?department=6", {
+          response = await ApiClient.get("import.meta.env.VITE_API_URL/api/onboarding/?department=6", {
             headers: {
               Authorization: `Token ${token}`,
               "Content-Type": "application/json",
@@ -738,7 +738,7 @@ export default function CreateNewCustomer({
           });
         } catch (error) {
           console.warn("Department filter not supported, fetching all candidates:", error);
-          response = await axios.get("http://127.0.0.1:8000/api/onboarding/", {
+          response = await ApiClient.get("import.meta.env.VITE_API_URL/api/onboarding/", {
             headers: {
               Authorization: `Token ${token}`,
               "Content-Type": "application/json",
@@ -911,15 +911,15 @@ export default function CreateNewCustomer({
 
       let response;
       if (editShowAddCustom && editAddCustomData.id) {
-        response = await axios.put(
-          `http://127.0.0.1:8000/api/customers/${editAddCustomData.id}/`,
+        response = await ApiClient.put(
+          `import.meta.env.VITE_API_URL/api/customers/${editAddCustomData.id}/`,
           formData,
           config
         );
         toast.success("Customer updated successfully!");
       } else {
-        response = await axios.post(
-          "http://127.0.0.1:8000/api/customers/",
+        response = await ApiClient.post(
+          "import.meta.env.VITE_API_URL/api/customers/",
           formData,
           config
         );

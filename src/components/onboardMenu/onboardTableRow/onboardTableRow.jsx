@@ -224,7 +224,7 @@ export default function OnboardTableRow({ ele, ind, handleDeleteCandidate }) {
 
     // Fetch department
     const departmentRes = await fetch(
-      `http://127.0.0.1:8000/api/departments/${department_id}/`,
+      `import.meta.env.VITE_API_URL/api/departments/${department_id}/`,
       { headers }
     );
     const departmentData = departmentRes.ok
@@ -233,7 +233,7 @@ export default function OnboardTableRow({ ele, ind, handleDeleteCandidate }) {
 
     // Fetch designation
     const designationRes = await fetch(
-      `http://127.0.0.1:8000/api/roles/${designation_id}/`,
+      `import.meta.env.VITE_API_URL/api/roles/${designation_id}/`,
       { headers }
     );
     const designationData = designationRes.ok

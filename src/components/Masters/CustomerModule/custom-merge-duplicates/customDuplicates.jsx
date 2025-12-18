@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import "./customDuplicates.css";
 import { toast } from "react-toastify";
 
-import axios from "axios";
+import ApiClient from "../../network/api-client";
 
 export default function CustomDuplicates({ setShowCustomDuplicates, customMaster, setApiCustomMaster }) {
   const [duplicates, setDuplicates] = useState([]);
@@ -24,7 +24,7 @@ export default function CustomDuplicates({ setShowCustomDuplicates, customMaster
 
       setIsLoading(true);
       try {
-        const response = await axios.get("http://127.0.0.1:8000/api/customers/duplicates/", {
+        const response = await ApiClient.get("import.meta.env.VITE_API_URL/api/customers/duplicates/", {
           headers: {
             Authorization: `Token ${token}`,
             "Content-Type": "application/json",
@@ -80,8 +80,8 @@ export default function CustomDuplicates({ setShowCustomDuplicates, customMaster
         const primaryRecord = group.primary;
         const duplicateIds = group.duplicates.map((dup) => dup.id);
 
-        const response = await axios.post(
-          "http://127.0.0.1:8000/api/customers/merge/",
+        const response = await ApiClient.post(
+          "import.meta.env.VITE_API_URL/api/customers/merge/",
           {
             primary_id: primaryRecord.id,
             duplicate_ids: duplicateIds,

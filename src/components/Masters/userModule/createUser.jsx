@@ -1,7 +1,7 @@
 // import React, { useState, useEffect } from "react";
 // import "./createUser.css";
 // import { toast } from "react-toastify";
-// import axios from "axios";
+// import ApiClient from "../../network/api-client";
 // import { useNavigate } from "react-router-dom";
 
 // export default function CreateUser({
@@ -76,16 +76,16 @@
 //   const fetchData = async () => {
 //     try {
 //       const [branchRes, deptRes, roleRes, userRes] = await Promise.all([
-//         axios.get("http://127.0.0.1:8000/api/branches/", {
+//         ApiClient.get("import.meta.env.VITE_API_URL/api/branches/", {
 //           headers: { Authorization: `Token ${token}` },
 //         }),
-//         axios.get("http://127.0.0.1:8000/api/departments/", {
+//         ApiClient.get("import.meta.env.VITE_API_URL/api/departments/", {
 //           headers: { Authorization: `Token ${token}` },
 //         }),
-//         axios.get(`http://127.0.0.1:8000/api/roles/${createUserForm.department ? `?department=${createUserForm.department}` : ''}`, {
+//         ApiClient.get(`import.meta.env.VITE_API_URL/api/roles/${createUserForm.department ? `?department=${createUserForm.department}` : ''}`, {
 //           headers: { Authorization: `Token ${token}` },
 //         }),
-//         axios.get("http://127.0.0.1:8000/api/users/", {
+//         ApiClient.get("import.meta.env.VITE_API_URL/api/users/", {
 //           headers: { Authorization: `Token ${token}` },
 //         }),
 //       ]);
@@ -176,15 +176,15 @@
 
 //       let response;
 //       if (editCreateUser && edituser.id) {
-//         response = await axios.put(
-//           `http://127.0.0.1:8000/api/users/${edituser.id}/`,
+//         response = await ApiClient.put(
+//           `import.meta.env.VITE_API_URL/api/users/${edituser.id}/`,
 //           formData,
 //           config
 //         );
 //         toast.success("User updated successfully");
 //       } else {
 //         formData.password = "defaultPassword123"; // Replace with secure password handling
-//         response = await axios.post("http://127.0.0.1:8000/api/users/", formData, config);
+//         response = await ApiClient.post("import.meta.env.VITE_API_URL/api/users/", formData, config);
 //         toast.success("User created successfully");
 //       }
 

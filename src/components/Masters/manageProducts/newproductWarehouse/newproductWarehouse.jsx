@@ -173,7 +173,7 @@
 
 import React, { useState, useEffect } from "react";
 import "./newproductWarehouse.css";
-import axios from "axios";
+import ApiClient from "../../network/api-client";
 import { ToastContainer, toast } from "react-toastify";
 
 export default function NewProductWarehouse({
@@ -203,7 +203,7 @@ export default function NewProductWarehouse({
           toast.error("No authentication token found. Please log in.");
           return;
         }
-        const res = await axios.get("http://127.0.0.1:8000/api/warehouses/", {
+        const res = await ApiClient.get("import.meta.env.VITE_API_URL/api/warehouses/", {
           headers: {
             Authorization: `Token ${token}`,
           },
@@ -256,8 +256,8 @@ export default function NewProductWarehouse({
 
       if (newproductWarehouse) {
         // ADD NEW WAREHOUSE
-        const res = await axios.post(
-          "http://127.0.0.1:8000/api/warehouses/",
+        const res = await ApiClient.post(
+          "import.meta.env.VITE_API_URL/api/warehouses/",
           {
             name: WarehouseData.warehouse_name,
             location: WarehouseData.location,
@@ -288,8 +288,8 @@ export default function NewProductWarehouse({
           return;
         }
 
-        const res = await axios.put(
-          `http://127.0.0.1:8000/api/warehouses/${selectedWarehouse.id}/`,
+        const res = await ApiClient.put(
+          `import.meta.env.VITE_API_URL/api/warehouses/${selectedWarehouse.id}/`,
           {
             name: WarehouseData.warehouse_name,
             location: WarehouseData.location,
@@ -354,7 +354,7 @@ export default function NewProductWarehouse({
         return;
       }
 
-      await axios.delete(`http://127.0.0.1:8000/api/warehouses/${selectedWarehouse.id}/`, {
+      await ApiClient.delete(`import.meta.env.VITE_API_URL/api/warehouses/${selectedWarehouse.id}/`, {
         headers: {
           Authorization: `Token ${token}`,
         },

@@ -1,7 +1,7 @@
 // import React, { useState, useEffect } from "react";
 // import "./createDepartmentrole.css";
 // import { toast } from "react-toastify";
-// import axios from "axios";
+// import ApiClient from "../../network/api-client";
 
 // export default function createDepartmentRole({
 //   setShowDepartmentRole,
@@ -32,7 +32,7 @@
 //   useEffect(() => {
 //     const fetchBranches = async () => {
 //       try {
-//         const response = await axios.get("http://127.0.0.1:8000/api/branches/", {
+//         const response = await ApiClient.get("import.meta.env.VITE_API_URL/api/branches/", {
 //           headers: {
 //             Authorization: `Token ${token}`,
 //             "Content-Type": "application/json",
@@ -76,8 +76,8 @@
 //   const fetchRoles = async (departmentId) => {
 //     setRolesLoading(true);
 //     try {
-//       const response = await axios.get(
-//         `http://127.0.0.1:8000/api/roles/?department=${departmentId}`,
+//       const response = await ApiClient.get(
+//         `import.meta.env.VITE_API_URL/api/roles/?department=${departmentId}`,
 //         {
 //           headers: {
 //             Authorization: `Token ${token}`,
@@ -97,7 +97,7 @@
 //   const fetchExampleRoles = async () => {
 //     setRolesLoading(true);
 //     try {
-//       const response = await axios.get("http://127.0.0.1:8000/api/roles/?page=1&per_page=3", {
+//       const response = await ApiClient.get("import.meta.env.VITE_API_URL/api/roles/?page=1&per_page=3", {
 //         headers: {
 //           Authorization: `Token ${token}`,
 //           "Content-Type": "application/json",
@@ -126,7 +126,7 @@
 
 //     if (okDel) {
 //       try {
-//         await axios.delete(`http://127.0.0.1:8000/api/roles/${roleId}/`, {
+//         await ApiClient.delete(`import.meta.env.VITE_API_URL/api/roles/${roleId}/`, {
 //           headers: {
 //             Authorization: `Token ${token}`,
 //             "Content-Type": "application/json",
@@ -161,7 +161,7 @@
 //         },
 //       };
 
-//       const url = "http://127.0.0.1:8000/api/departments/";
+//       const url = "import.meta.env.VITE_API_URL/api/departments/";
 //       const data = createDepartmentForm;
 
 //       // Check if we're editing or creating

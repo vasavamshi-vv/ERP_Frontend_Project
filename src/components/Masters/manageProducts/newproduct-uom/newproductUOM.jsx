@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./newproductUOM.css";
-import axios from "axios";
+import ApiClient from "../../network/api-client";
 import { ToastContainer, toast } from "react-toastify";
 
 export default function NewProductUOM({
@@ -28,7 +28,7 @@ export default function NewProductUOM({
           toast.error("No authentication token found. Please log in.");
           return;
         }
-        const res = await axios.get("http://127.0.0.1:8000/api/uoms/", {
+        const res = await ApiClient.get("import.meta.env.VITE_API_URL/api/uoms/", {
           headers: {
             Authorization: `Token ${token}`,
           },
@@ -77,8 +77,8 @@ export default function NewProductUOM({
 
       if (newProductUOM) {
         // ADD NEW UOM
-        const res = await axios.post(
-          "http://127.0.0.1:8000/api/uoms/",
+        const res = await ApiClient.post(
+          "import.meta.env.VITE_API_URL/api/uoms/",
           {
             name: UOMData.uom_name,
             items: parseInt(UOMData.items),
@@ -107,8 +107,8 @@ export default function NewProductUOM({
           return;
         }
 
-        const res = await axios.put(
-          `http://127.0.0.1:8000/api/uoms/${selectedUOM.id}/`,
+        const res = await ApiClient.put(
+          `import.meta.env.VITE_API_URL/api/uoms/${selectedUOM.id}/`,
           {
             name: UOMData.uom_name,
             items: parseInt(UOMData.items),
@@ -169,7 +169,7 @@ export default function NewProductUOM({
         return;
       }
 
-      await axios.delete(`http://127.0.0.1:8000/api/uoms/${selectedUOM.id}/`, {
+      await ApiClient.delete(`import.meta.env.VITE_API_URL/api/uoms/${selectedUOM.id}/`, {
         headers: {
           Authorization: `Token ${token}`,
         },

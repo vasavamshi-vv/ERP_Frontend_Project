@@ -3,7 +3,7 @@
 // import { Link } from "react-router-dom";
 // import OnboardTableRow from "../onboardTableRow/onboardTableRow";
 // import { toast } from "react-toastify";
-
+// import ApiClient from "../../../network/api-client";
 // export default function onboard() {
 //   const [candidateAPIdata, setcandidateAPIdata] = useState({});
 //   const [employees, setemployees] = useState([]);
@@ -352,7 +352,6 @@ import "./onboard.css";
 import { Link, useNavigate } from "react-router-dom";
 import OnboardTableRow from "../onboardTableRow/onboardTableRow";
 import { toast } from "react-toastify";
-import axios from "axios";
 
 export default function Onboard() {
   const [employees, setEmployees] = useState([]);
@@ -373,7 +372,7 @@ export default function Onboard() {
           return;
         }
 
-        const response = await axios.get("http://127.0.0.1:8000/api/onboarding/", {
+        const response = await ApiClient.get("import.meta.env.VITE_API_URL/api/onboarding/", {
           headers: {
             Authorization: `Token ${token}`,
             "Content-Type": "application/json",
@@ -409,7 +408,7 @@ export default function Onboard() {
       }
 
       axios
-        .delete(`http://127.0.0.1:8000/api/onboarding/${candidateId}/`, {
+        .delete(`import.meta.env.VITE_API_URL/api/onboarding/${candidateId}/`, {
           headers: {
             Authorization: `Token ${token}`,
             "Content-Type": "application/json",

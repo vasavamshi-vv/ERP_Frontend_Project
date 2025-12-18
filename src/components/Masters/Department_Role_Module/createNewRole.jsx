@@ -1,6 +1,6 @@
 // import React, { useState, useEffect } from "react";
 // import "./createNewRole.css";
-// import axios from "axios";
+// import ApiClient from "../../network/api-client";
 // import { toast } from "react-toastify";
 
 // export default function CreateNewRole({
@@ -114,7 +114,7 @@
 //   useEffect(() => {
 //     const fetchBranches = async () => {
 //       try {
-//         const response = await axios.get("http://127.0.0.1:8000/api/branches/", {
+//         const response = await ApiClient.get("import.meta.env.VITE_API_URL/api/branches/", {
 //           headers: {
 //             Authorization: `Token ${token}`,
 //             "Content-Type": "application/json",
@@ -146,8 +146,8 @@
 //       let totalPages = 1;
 
 //       do {
-//         const response = await axios.get(
-//           `http://127.0.0.1:8000/api/departments/?page=${page}`,
+//         const response = await ApiClient.get(
+//           `import.meta.env.VITE_API_URL/api/departments/?page=${page}`,
 //           {
 //             headers: {
 //               Authorization: `Token ${token}`,
@@ -163,8 +163,8 @@
 //       } while (page <= totalPages);
 
 //       // Fetch all roles (only if you need roles here too)
-//       const roleResponse = await axios.get(
-//         "http://127.0.0.1:8000/api/roles/",
+//       const roleResponse = await ApiClient.get(
+//         "import.meta.env.VITE_API_URL/api/roles/",
 //         {
 //           headers: {
 //             Authorization: `Token ${token}`,
@@ -321,11 +321,11 @@
 
 //     if (editRoleOnly && editRole?.id) {
 //       // ✅ Edit mode → use PUT
-//       res = await axios.put(`http://127.0.0.1:8000/api/roles/${editRole.id}/`, data, config);
+//       res = await ApiClient.put(`import.meta.env.VITE_API_URL/api/roles/${editRole.id}/`, data, config);
 //       toast.success("Role updated successfully!");
 //     } else {
 //       // ✅ Create mode → use POST
-//       res = await axios.post("http://127.0.0.1:8000/api/roles/", data, config);
+//       res = await ApiClient.post("import.meta.env.VITE_API_URL/api/roles/", data, config);
 //       toast.success("Role created successfully!");
 //     }
 //     // resetRoleForm();

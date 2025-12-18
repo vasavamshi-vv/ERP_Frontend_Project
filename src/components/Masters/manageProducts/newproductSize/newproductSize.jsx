@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./newproductSize.css";
-import axios from "axios";
+import ApiClient from "../../network/api-client";
 import { ToastContainer, toast } from "react-toastify";
 
 export default function NewProductSize({
@@ -27,7 +27,7 @@ export default function NewProductSize({
           toast.error("No authentication token found. Please log in.");
           return;
         }
-        const res = await axios.get("http://127.0.0.1:8000/api/sizes/", {
+        const res = await ApiClient.get("import.meta.env.VITE_API_URL/api/sizes/", {
           headers: {
             Authorization: `Token ${token}`,
           },
@@ -62,8 +62,8 @@ export default function NewProductSize({
 
       if (newproductSize) {
         // ADD NEW SIZE
-        const res = await axios.post(
-          "http://127.0.0.1:8000/api/sizes/",
+        const res = await ApiClient.post(
+          "import.meta.env.VITE_API_URL/api/sizes/",
           { name: SizeData.size_name },
           {
             headers: {
@@ -88,8 +88,8 @@ export default function NewProductSize({
           return;
         }
 
-        const res = await axios.put(
-          `http://127.0.0.1:8000/api/sizes/${selectedSize.id}/`,
+        const res = await ApiClient.put(
+          `import.meta.env.VITE_API_URL/api/sizes/${selectedSize.id}/`,
           { name: SizeData.update_size_name },
           {
             headers: {
@@ -145,7 +145,7 @@ export default function NewProductSize({
         return;
       }
 
-      await axios.delete(`http://127.0.0.1:8000/api/sizes/${selectedSize.id}/`, {
+      await ApiClient.delete(`import.meta.env.VITE_API_URL/api/sizes/${selectedSize.id}/`, {
         headers: {
           Authorization: `Token ${token}`,
         },

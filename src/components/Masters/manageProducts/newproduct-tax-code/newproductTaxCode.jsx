@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./newproductTaxCode.css";
-import axios from "axios";
+import ApiClient from "../../network/api-client";
 import { ToastContainer, toast } from "react-toastify";
 
 export default function NewProductTaxCode({
@@ -28,7 +28,7 @@ export default function NewProductTaxCode({
           toast.error("No authentication token found. Please log in.");
           return;
         }
-        const res = await axios.get("http://127.0.0.1:8000/api/tax-codes/", {
+        const res = await ApiClient.get("import.meta.env.VITE_API_URL/api/tax-codes/", {
           headers: {
             Authorization: `Token ${token}`,
           },
@@ -77,8 +77,8 @@ export default function NewProductTaxCode({
 
       if (newproduct_tax_code) {
         // ADD NEW TAX CODE
-        const res = await axios.post(
-          "http://127.0.0.1:8000/api/tax-codes/",
+        const res = await ApiClient.post(
+          "import.meta.env.VITE_API_URL/api/tax-codes/",
           {
             name: TaxCodeData.tax_name,
             percentage: parseFloat(TaxCodeData.tax_percentage),
@@ -107,8 +107,8 @@ export default function NewProductTaxCode({
           return;
         }
 
-        const res = await axios.put(
-          `http://127.0.0.1:8000/api/tax-codes/${selectedTaxCode.id}/`,
+        const res = await ApiClient.put(
+          `import.meta.env.VITE_API_URL/api/tax-codes/${selectedTaxCode.id}/`,
           {
             name: TaxCodeData.tax_name,
             percentage: parseFloat(TaxCodeData.tax_percentage),
@@ -169,7 +169,7 @@ export default function NewProductTaxCode({
         return;
       }
 
-      await axios.delete(`http://127.0.0.1:8000/api/tax-codes/${selectedTaxCode.id}/`, {
+      await ApiClient.delete(`import.meta.env.VITE_API_URL/api/tax-codes/${selectedTaxCode.id}/`, {
         headers: {
           Authorization: `Token ${token}`,
         },

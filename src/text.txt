@@ -5,7 +5,7 @@ import { useDispatch } from "react-redux";
 import { login } from "../../redux/authSlice";
 import { toast } from "react-toastify";
 import siteLogo from "../../assets/signin/sitelogo.png";
-import axios from "axios";
+import ApiClient from "../../network/api-client";
 
 export default function Signin() {
   const navigate = useNavigate();
@@ -31,7 +31,7 @@ export default function Signin() {
     setLoading(true);
 
     try {
-      const response = await axios.post(
+      const response = await ApiClient.post(
         API_URL,
         {
           email: userMail,

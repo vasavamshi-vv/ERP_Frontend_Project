@@ -1,71 +1,7 @@
-// import axios from "axios";
-// import { API_URL } from "../utills/utills";
-
-// const BASE = (API_URL || "").replace(/\/+$/, "");
-
-// const ApiClient = axios.create({
-//   baseURL: BASE,
-//   timeout: 20000,
-// });
-
-// // REQUEST INTERCEPTOR
-// ApiClient.interceptors.request.use(
-//   (config) => {
-//     // Attach token
-//     console.log("Axios request config:", config);
-//     const token = localStorage.getItem("token");
-//     if (token) {
-//       config.headers = {
-//         ...config.headers,
-//         Authorization: `Token ${token}`,
-//         Accept: "application/json",
-//         "Content-Type": "application/json",
-//       };
-//     }
-
-//     /**
-//      * ⭐ IMPORTANT ⭐
-//      * Many enterprise backends accept GET requests with a request body.
-//      * We convert GET + params → GET + data (payload shown in Network tab)
-//      */
-//     if (config.method === "get" && config.params) {
-//       config.data = config.params;  // move params to payload
-//       delete config.params;
-//     }
-
-//     return config;
-//   },
-//   (error) => Promise.reject(error)
-// );
-
-// // RESPONSE INTERCEPTOR
-// ApiClient.interceptors.response.use(
-//   (response) => response,
-//   (error) => {
-//     if (error.response) {
-//       const status = error.response.status;
-
-//       if (status === 401 || status === 403) {
-//         localStorage.removeItem("token");
-//         localStorage.removeItem("user");
-//         window.location.href = "/signin";
-//       }
-//     } else {
-//       console.error("Network error (no response)", error);
-//     }
-
-//     return Promise.reject(error);
-//   }
-// );
-
-// export default ApiClient;
-import axios from "axios";
-import { API_URL } from "../utills/utills";
-
-const BASE = (API_URL || "").replace(/\/+$/, "");
+import ApiClient from "../../network/api-client";
 
 const ApiClient = axios.create({
-  baseURL: BASE,
+  baseURL: import.meta.env.VITE_API_URL,
   timeout: 20000,
   headers: {
     Accept: "application/json",
@@ -76,13 +12,10 @@ const ApiClient = axios.create({
 // REQUEST INTERCEPTOR
 ApiClient.interceptors.request.use(
   (config) => {
-    console.log("Axios request:", config.method?.toUpperCase(), config.url);
-
     const token = localStorage.getItem("token");
     if (token) {
       config.headers.Authorization = `Token ${token}`;
     }
-
     return config;
   },
   (error) => Promise.reject(error)
@@ -92,18 +25,11 @@ ApiClient.interceptors.request.use(
 ApiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response) {
-      const status = error.response.status;
-
-      if (status === 401 || status === 403) {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        window.location.href = "/signin";
-      }
-    } else {
-      console.error("Network error", error);
+    if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      window.location.href = "/signin";
     }
-
     return Promise.reject(error);
   }
 );

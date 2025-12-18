@@ -25,7 +25,7 @@
 // //     const authState = JSON.parse(persistedAuth.auth || "{}");
 // //     const token = authState?.user?.token;
 
-// //     const response = await fetch(`http://127.0.0.1:8000/api/departments/?page=${page}`, {
+// //     const response = await fetch(`import.meta.env.VITE_API_URL/api/departments/?page=${page}`, {
 // //       headers: {
 // //         Authorization: `Token ${token}`,
 // //         "Content-Type": "application/json",
@@ -110,7 +110,7 @@
 // //       const authState = JSON.parse(persistedAuth.auth || "{}");
 // //       const token = authState?.user?.token;
 
-// //       const response = await fetch(`http://127.0.0.1:8000/api/departments/${id}/`, {
+// //       const response = await fetch(`import.meta.env.VITE_API_URL/api/departments/${id}/`, {
 // //         method: "DELETE",
 // //         headers: {
 // //           Authorization: `Token ${token}`,
