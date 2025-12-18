@@ -1,6 +1,6 @@
 // import { AccessApiResponseSchema } from "@/model/access";
 // import { GenericRequestSchema, GenericResponseSchema } from "@/model/generic";
-// import ApiClient from "@/network/api-client";
+import ApiClient from "@/network/api-client";
 // import notification from "@/utills/notification";
 
 // class AccessApiProvider {

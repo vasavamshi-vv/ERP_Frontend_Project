@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import "./customDuplicates.css";
 import { toast } from "react-toastify";
 
-import ApiClient from "../../network/api-client";
+import ApiClient from "@/network/api-client";
 
 export default function CustomDuplicates({ setShowCustomDuplicates, customMaster, setApiCustomMaster }) {
   const [duplicates, setDuplicates] = useState([]);

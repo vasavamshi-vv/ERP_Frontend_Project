@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./customMaster.css";
 import { toast } from "react-toastify";
-import ApiClient from "../../network/api-client";
+import ApiClient from "@/network/api-client";
 import CreateNewCustomer from "../create-new-customer/createNewCustomer";
 import CustomImport from "../custom-Import/customImport";
 import CustomDuplicates from "../custom-merge-duplicates/customDuplicates";

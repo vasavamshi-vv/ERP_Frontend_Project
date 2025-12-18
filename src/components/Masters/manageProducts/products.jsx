@@ -354,7 +354,7 @@
 // import "./products.css";
 // import { ToastContainer,  toast } from "react-toastify";
 // import "react-toastify/dist/ReactToastify.css";
-// import ApiClient from "../../network/api-client";
+import ApiClient from "@/network/api-client";
 // import CreateNewProduct from "./createNewProduct";
 // import ProductImport from "./productImport/productImport";
 

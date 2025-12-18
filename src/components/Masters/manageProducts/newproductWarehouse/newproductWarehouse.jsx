@@ -173,7 +173,7 @@
 
 import React, { useState, useEffect } from "react";
 import "./newproductWarehouse.css";
-import ApiClient from "../../network/api-client";
+import ApiClient from "@/network/api-client";
 import { ToastContainer, toast } from "react-toastify";
 
 export default function NewProductWarehouse({

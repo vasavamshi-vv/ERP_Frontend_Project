@@ -1,25 +1,24 @@
-# ---------- Build stage ----------
+# ---------- BUILD STAGE ----------
 FROM node:20-alpine AS build
 
 WORKDIR /app
 
-COPY package*.json ./
-RUN npm install
+COPY package.json package-lock.json ./
+RUN npm install --include=dev
 
 COPY . .
 RUN npm run build
 
-
-# ---------- Runtime stage ----------
+# ---------- NGINX STAGE ----------
 FROM nginx:alpine
 
-# Remove default nginx config
+# Remove default config
 RUN rm /etc/nginx/conf.d/default.conf
 
-# Custom nginx config
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Copy our React nginx config
+COPY nginx/default.conf /etc/nginx/conf.d/default.conf
 
-# Copy built files
+# Copy build output
 COPY --from=build /app/dist /usr/share/nginx/html
 
 EXPOSE 80

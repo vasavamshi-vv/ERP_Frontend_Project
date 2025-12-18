@@ -3,7 +3,7 @@
 // import { Link } from "react-router-dom";
 // import OnboardTableRow from "../onboardTableRow/onboardTableRow";
 // import { toast } from "react-toastify";
-// import ApiClient from "../../../network/api-client";
+import ApiClient from "@/network/api-client";
 // export default function onboard() {
 //   const [candidateAPIdata, setcandidateAPIdata] = useState({});
 //   const [employees, setemployees] = useState([]);

@@ -1,6 +1,6 @@
 // import React, { useState, useEffect } from "react";
 // import "./createNewRole.css";
-// import ApiClient from "../../network/api-client";
+// import ApiClient from "@/network/api-client";
 // import { toast } from "react-toastify";
 
 // export default function CreateNewRole({
@@ -553,7 +553,6 @@
 // import "./createNewRole.css";
 // import { toast } from "react-toastify";
 // import departmentRoleApiProvider from "../../../network/departmentRole-api-provider";
-// import ApiClient from "../../../network/api-client"; // for fetching branches
 
 // export default function CreateNewRole({
 //   setShowNewRole,
@@ -829,7 +828,6 @@ import React, { useState, useEffect } from "react";
 import "./createNewRole.css";
 import { toast } from "react-toastify";
 import departmentRoleApiProvider from "../../../network/departmentRole-api-provider";
-import ApiClient from "../../../network/api-client"; // for fetching branches
 
 export default function CreateNewRole({
   setShowNewRole,

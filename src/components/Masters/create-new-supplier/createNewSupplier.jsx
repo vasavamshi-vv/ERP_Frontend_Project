@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./createNewSupplier.css";
-// import SupplierListItem from "./SupplierListItem";
-import SupplierComment from "./SupplierComment";
-import SupplierHistory from "./SupplierHistory";
-import SupplierAttachment from "./SupplierAttachment";
+// import SupplierListItem from "./supplierListItem";
+import SupplierComment from "./supplierComment";
+import SupplierHistory from "./supplierHistory";
+import SupplierAttachment from "./supplierAttachment";
 import { toast } from "react-toastify";
 
 export default function createNewSupplier() {

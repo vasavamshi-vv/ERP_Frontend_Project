@@ -2,7 +2,7 @@
 // import "./manageUsers.css";
 // import CreateUser from "./createUser";
 // import { toast } from "react-toastify";
-// import ApiClient from "../../network/api-client";
+import ApiClient from "@/network/api-client";
 
 // export default function ManageUsers() {
 //   const [manageAPIdata, setmanageAPIdata] = useState({});

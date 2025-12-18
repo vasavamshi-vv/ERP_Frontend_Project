@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from "react";
-import ApiClient from "../../network/api-client";
+import ApiClient from "@/network/api-client";
 import "./addNewCandidate.css";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";

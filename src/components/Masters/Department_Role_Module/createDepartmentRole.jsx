@@ -1,7 +1,7 @@
 // import React, { useState, useEffect } from "react";
 // import "./createDepartmentrole.css";
 // import { toast } from "react-toastify";
-// import ApiClient from "../../network/api-client";
+import ApiClient from "@/network/api-client";
 
 // export default function createDepartmentRole({
 //   setShowDepartmentRole,

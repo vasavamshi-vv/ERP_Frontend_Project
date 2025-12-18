@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./newproductColor.css";
-import ApiClient from "../../network/api-client";
+import ApiClient from "@/network/api-client";
 import { ToastContainer, toast } from "react-toastify";
 
 export default function NewProductColor({

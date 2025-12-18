@@ -5,7 +5,7 @@ import { useDispatch } from "react-redux";
 import { login } from "../../redux/authSlice";
 import { toast } from "react-toastify";
 import siteLogo from "../../assets/signin/sitelogo.png";
-import ApiClient from "../../network/api-client";
+import ApiClient from "@/network/api-client";
 
 export default function Signin() {
   const navigate = useNavigate();

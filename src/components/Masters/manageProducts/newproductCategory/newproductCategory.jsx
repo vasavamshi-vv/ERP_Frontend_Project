@@ -1,6 +1,6 @@
 // import React, { useState, useEffect } from "react";
 // import "./newproductCategory.css";
-// import ApiClient from "../../network/api-client";
+// import ApiClient from "@/network/api-client";
 
 // export default function newproductCategory({
 //   newproductCategory,
@@ -204,7 +204,6 @@
 
 import React, { useState, useEffect } from "react";
 import "./newproductCategory.css";
-import ApiClient from "../../network/api-client";
 import { ToastContainer, toast } from "react-toastify";
 
 export default function NewProductCategory({

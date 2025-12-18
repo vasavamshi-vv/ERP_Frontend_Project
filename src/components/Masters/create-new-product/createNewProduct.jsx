@@ -11,7 +11,7 @@ import NewproductWarehouse from "../manageProducts/newproductWarehouse/newproduc
 import NewproductSupplier from "../manageProducts/newproductSupplier/newproductSupplier";
 import NewproductSize from "../manageProducts/newproductSize/newproductSize";
 import NewproductColor from "../manageProducts/newproductColor/newproductColor";
-import ApiClient from "../../network/api-client";
+import ApiClient from "@/network/api-client";
 
 export default function createNewProduct({
   setshowNewProduct,
