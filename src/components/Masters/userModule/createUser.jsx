@@ -1,8 +1,9 @@
 // import React, { useState, useEffect } from "react";
 // import "./createUser.css";
 // import { toast } from "react-toastify";
-// import axios from "axios";
 // import { useNavigate } from "react-router-dom";
+// import userApiProvider from "../../../network/user-api-provider";
+
 
 // export default function CreateUser({
 //   showCreateUser,
@@ -12,7 +13,8 @@
 //   setedituser,
 // }) {
 //   const navigate = useNavigate();
-//   const [createUserForm, setcreateUserForm] = useState({
+
+//   const initialForm = {
 //     first_name: "",
 //     last_name: "",
 //     email: "",
@@ -23,196 +25,153 @@
 //     reporting_to: "",
 //     available_branches: "",
 //     employee_id: "",
-//   });
+//   };
+
+//   const [createUserForm, setcreateUserForm] = useState(initialForm);
+
 //   const [branchList, setBranchList] = useState([]);
 //   const [departmentList, setDepartmentList] = useState([]);
 //   const [roleList, setRoleList] = useState([]);
-//   const [userList, setUserList] = useState([]);
 //   const [filteredRoles, setFilteredRoles] = useState([]);
 
-//   // Pre-fill form in edit mode
+//   // =============================================
+//   // Prefill on Edit
+//   // =============================================
 //   useEffect(() => {
-//     if (editCreateUser && edituser && Object.keys(edituser).length > 0) {
-//       console.log("Pre-filling form with edituser:", edituser);
-//       setcreateUserForm({
-//         first_name: edituser.first_name || "",
-//         last_name: edituser.last_name || "",
-//         email: edituser.email || "",
-//         contact_number: edituser.profile?.contact_number || "",
-//         employee_id: edituser.profile?.employee_id || "",
-//         branch: edituser.profile?.branch?.id || edituser.profile?.branch || "",
-//         department: edituser.profile?.department?.id || edituser.profile?.department || "",
-//         role: edituser.profile?.role.id || edituser.profile?.role || "",
-//         reporting_to: edituser.profile?.reporting_to || "",
-//         available_branches: Array.isArray(edituser.profile?.available_branches)
-//           ? edituser.profile.available_branches.join(", ")
-//           : edituser.profile?.available_branches || "",
-//       });
-//     } else {
-//       setcreateUserForm({
-//         first_name: "",
-//         last_name: "",
-//         email: "",
-//         contact_number: "",
-//         branch: "",
-//         department: "",
-//         role: "",
-//         reporting_to: "",
-//         available_branches: "",
-//         employee_id: "",
-//       });
-//     }
-//   }, [edituser, editCreateUser]);
-
-//   // Fetch branches, departments, roles, and users
-//   useEffect(() => {
-//   const persistedAuth = JSON.parse(localStorage.getItem("persist:root") || "{}");
-//   const authState = JSON.parse(persistedAuth.auth || "{}");
-//   const token = authState?.user?.token;
-//   if (!token) {
-//     toast.error("No authentication token found. Please log in.");
-//     return;
-//   }
-//   const fetchData = async () => {
-//     try {
-//       const [branchRes, deptRes, roleRes, userRes] = await Promise.all([
-//         axios.get("http://127.0.0.1:8000/api/branches/", {
-//           headers: { Authorization: `Token ${token}` },
-//         }),
-//         axios.get("http://127.0.0.1:8000/api/departments/", {
-//           headers: { Authorization: `Token ${token}` },
-//         }),
-//         axios.get(`http://127.0.0.1:8000/api/roles/${createUserForm.department ? `?department=${createUserForm.department}` : ''}`, {
-//           headers: { Authorization: `Token ${token}` },
-//         }),
-//         axios.get("http://127.0.0.1:8000/api/users/", {
-//           headers: { Authorization: `Token ${token}` },
-//         }),
-//       ]);
-//       console.log("Raw Roles API Response:", roleRes.data);
-//       setBranchList(branchRes.data || []);
-//       setDepartmentList(deptRes.data.departments || []);
-//       setRoleList(Array.isArray(roleRes.data) ? roleRes.data : (roleRes.data.roles || []));
-//       // ... rest of the code
-//     } catch (err) {
-//       console.error("Error fetching data:", err);
-//       toast.error("Failed to load dropdown data");
-//       setUserList([]);
-//     }
-//   };
-//   fetchData();
-// }, [createUserForm.department]);
-
-//   // Filter roles based on selected department
-// useEffect(() => {
-//   if (createUserForm.department && roleList.length > 0) {
-//     const deptId = Number(createUserForm.department);
-//     console.log("Selected department ID:", deptId);
-//     console.log("All role department values:", roleList.map(r => r.department?.id ?? r.department ?? r.department_id));
-//     console.log("Role objects for debugging:", roleList);
-
-//     const rolesForDept = roleList.filter(
-//       (role) =>
-//         (typeof role.department === "object" && role.department?.id === deptId) ||
-//         (typeof role.department === "number" && role.department === deptId) ||
-//         (role.department_id === deptId) // Fallback to department_id
-//     );
-//     console.log("Filtered roles:", rolesForDept);
-//     setFilteredRoles(rolesForDept);
-//   } else {
-//     setFilteredRoles([]);
-//   }
-// }, [createUserForm.department, roleList]);
-
-//   const handleFormChange = (e) => {
-//     const { id, value } = e.target;
-//     setcreateUserForm((prev) => ({ ...prev, [id]: value }));
-
-//     if (id === "department") {
-//       setcreateUserForm((prev) => ({ ...prev, role: "" }));
-//     }
-//   };
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-//     const persistedAuth = JSON.parse(localStorage.getItem("persist:root") || "{}");
-//     const authState = JSON.parse(persistedAuth.auth || "{}");
-//     const token = authState?.user?.token;
-
-//     if (!token) {
-//       toast.error("No authentication token found. Please log in.");
+//     if (!editCreateUser || !edituser?.id) {
+//       setcreateUserForm(initialForm);
 //       return;
 //     }
 
-//     const formData = {
+//     setcreateUserForm({
+//       first_name: edituser.first_name || "",
+//       last_name: edituser.last_name || "",
+//       email: edituser.email || "",
+//       contact_number: edituser.profile?.contact_number || "",
+//       employee_id: edituser.profile?.employee_id || "",
+//       branch: edituser.profile?.branch?.id || "",
+//       department: edituser.profile?.department?.id || "",
+//       role: edituser.profile?.role?.id || "",
+//       reporting_to: edituser.profile?.reporting_to || "",
+//       available_branches:
+//         Array.isArray(edituser.profile?.available_branches)
+//           ? edituser.profile.available_branches.join(", ")
+//           : "",
+//     });
+//   }, [edituser, editCreateUser]);
+
+  
+
+//   // =============================================
+//   // Fetch Dropdown Data
+//   // =============================================
+//   useEffect(() => {
+//     const loadData = async () => {
+//       const branches = await userApiProvider.fetchBranches();
+//       const departments = await userApiProvider.fetchDepartments();
+//       const roles = await userApiProvider.fetchRoles(createUserForm.department);
+
+//       setBranchList(branches);
+//       setDepartmentList(departments);
+//       setRoleList(roles);
+//     };
+
+//     loadData();
+//   }, [createUserForm.department]);
+
+//   // =============================================
+//   // Filter Roles based on Department
+//   // =============================================
+//   useEffect(() => {
+//   if (!createUserForm.department || roleList.length === 0) {
+//     setFilteredRoles([]);
+//     return;
+//   }
+
+//   const selectedDept = departmentList.find(
+//     (d) => Number(d.id) === Number(createUserForm.department)
+//   );
+
+//   if (!selectedDept) {
+//     setFilteredRoles([]);
+//     return;
+//   }
+
+//   const deptName = selectedDept.department_name.toLowerCase();
+
+//   const filtered = roleList.filter((role) =>
+//     role.department_name?.toLowerCase() === deptName
+//   );
+
+//   setFilteredRoles(filtered);
+// }, [createUserForm.department, roleList, departmentList]);
+
+
+//   // =============================================
+//   // Handle Form Change
+//   // =============================================
+//   const handleFormChange = (e) => {
+//     const { id, value } = e.target;
+
+//     setcreateUserForm((prev) => ({
+//       ...prev,
+//       [id]: value,
+//       ...(id === "department" ? { role: "" } : {}), // reset role on department change
+//     }));
+//   };
+
+//   // =============================================
+//   // Submit Handler (Create + Edit)
+//   // =============================================
+//   const handleSubmit = async (e) => {
+//     e.preventDefault();
+
+//     const baseData = {
 //       first_name: createUserForm.first_name,
-//       last_name: createUserForm.last_name || "",
+//       last_name: createUserForm.last_name,
 //       profile: {
-//         contact_number: createUserForm.contact_number || "",
-//         branch: createUserForm.branch || null,
-//         department: createUserForm.department || null,
-//         role: createUserForm.role || null,
+//         contact_number: createUserForm.contact_number,
+//         branch: createUserForm.branch,
+//         department: createUserForm.department,
+//         role: createUserForm.role,
 //         reporting_to: createUserForm.reporting_to || null,
 //         available_branches: createUserForm.available_branches
 //           .split(",")
-//           .map((item) => item.trim())
+//           .map((b) => b.trim())
 //           .filter(Boolean),
 //       },
 //     };
 
-//     // Only include email and employee_id for create operations
-//     if (!editCreateUser) {
-//       formData.email = createUserForm.email;
-//       formData.profile.employee_id = createUserForm.employee_id;
+//     let response = null;
+
+//     if (editCreateUser) {
+//       response = await userApiProvider.updateUser(edituser.id, baseData);
+//     } else {
+//       response = await userApiProvider.createUser({
+//         ...baseData,
+//         email: createUserForm.email,
+//         password: "defaultPassword123",
+//         profile: {
+//           ...baseData.profile,
+//           employee_id: createUserForm.employee_id,
+//         },
+//       });
 //     }
 
-//     try {
-//       const config = {
-//         headers: {
-//           Authorization: `Token ${token}`,
-//           "Content-Type": "application/json",
-//         },
-//       };
+//     if (response) {
+//       toast.success(editCreateUser ? "User updated" : "User created");
 
-//       let response;
-//       if (editCreateUser && edituser.id) {
-//         response = await axios.put(
-//           `http://127.0.0.1:8000/api/users/${edituser.id}/`,
-//           formData,
-//           config
-//         );
-//         toast.success("User updated successfully");
-//       } else {
-//         formData.password = "defaultPassword123"; // Replace with secure password handling
-//         response = await axios.post("http://127.0.0.1:8000/api/users/", formData, config);
-//         toast.success("User created successfully");
-//       }
-
-//       console.log("Response:", response.data);
-//       setcreateUserForm({
-//         first_name: "",
-//         last_name: "",
-//         email: "",
-//         contact_number: "",
-//         branch: "",
-//         department: "",
-//         role: "",
-//         reporting_to: "",
-//         available_branches: "",
-//         employee_id: "",
-//       });
+//       await fetchUsers(); 
+//       setcreateUserForm(initialForm);
 //       setedituser({});
 //       setshowCreateUser(false);
-//       navigate("/?tab=manageUsers");
-//     } catch (error) {
-//       console.error("Error saving user:", error);
-//       const errorMessage = error.response?.data
-//         ? JSON.stringify(error.response.data)
-//         : error.message;
-//       toast.error(`Failed to save user: ${errorMessage}`);
+      
 //     }
 //   };
 
+//   // =============================================
+//   // JSX UI Rendering
+//   // =============================================
 //   return (
 //     <div className={`createuser-container ${showCreateUser ? "block" : "hidden"}`}>
 //       <svg
@@ -226,209 +185,163 @@
 //       >
 //         <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
 //       </svg>
+
 //       <div className="createuser-head">
-//         <p>{editCreateUser ? "Edit" : "Create New"} Branch Users</p>
+//         <p>{editCreateUser ? "Edit" : "Create New"} User</p>
 //       </div>
+
 //       <div className="createuser-body">
 //         <form onSubmit={handleSubmit}>
+
+//           {/* FIRST ROW */}
 //           <div className="createuser-content">
-//             <div className="createuser-box">
-//               <label htmlFor="first_name">
-//                 First Name<sup>*</sup>
-//               </label>
-//               <input
-//                 id="first_name"
-//                 name="first_name"
-//                 type="text"
-//                 placeholder="First Name"
-//                 value={createUserForm.first_name}
-//                 onChange={handleFormChange}
-//                 required
-//               />
-//             </div>
-//             <div className="createuser-box">
-//               <label htmlFor="last_name">
-//                 Last Name<sup>*</sup>
-//               </label>
-//               <input
-//                 id="last_name"
-//                 name="last_name"
-//                 type="text"
-//                 placeholder="Last Name"
-//                 value={createUserForm.last_name}
-//                 onChange={handleFormChange}
-//                 required
-//               />
-//             </div>
+//             <Input label="First Name" required id="first_name"
+//               value={createUserForm.first_name}
+//               placeholder="Enter Your First Name"
+//               onChange={handleFormChange}
+//             />
+//             <Input label="Last Name" required id="last_name"
+//               value={createUserForm.last_name}
+//               placeholder="Enter Your Last Name"
+//               onChange={handleFormChange}
+//             />
 //           </div>
+
+//           {/* SECOND ROW */}
 //           <div className="createuser-content">
-//             <div className="createuser-box">
-//               <label htmlFor="email">
-//                 Email<sup>*</sup>
-//               </label>
-//               <input
-//                 id="email"
-//                 name="email"
-//                 type="email"
-//                 placeholder="stackly@gmail.com"
-//                 value={createUserForm.email}
-//                 onChange={handleFormChange}
-//                 required
-//                 disabled={editCreateUser}
-//               />
-//             </div>
-//             <div className="createuser-box">
-//               <label htmlFor="contact_number">Contact Number</label>
-//               <input
-//                 id="contact_number"
-//                 name="contact_number"
-//                 type="number"
-//                 placeholder="9134554123"
-//                 value={createUserForm.contact_number}
-//                 onChange={handleFormChange}
-//               />
-//             </div>
+//             <Input label="Email" required id="email" disabled={editCreateUser}
+//               value={createUserForm.email}
+//               placeholder="Enter Your Email"
+//               onChange={handleFormChange}
+//             />
+//             <Input label="Contact Number" id="contact_number" type="number"
+//               value={createUserForm.contact_number}
+//               placeholder="Enter Your Contact Number"
+//               onChange={handleFormChange}
+//             />
 //           </div>
+
+//           {/* THIRD ROW */}
 //           <div className="createuser-content">
-//             <div className="createuser-box">
-//               <label htmlFor="branch">
-//                 Branch<sup>*</sup>
-//               </label>
-//               <select
-//                 id="branch"
-//                 name="branch"
-//                 value={createUserForm.branch}
-//                 onChange={handleFormChange}
-//                 className="candidate-input"
-//                 required
-//               >
-//                 <option value="">Select a branch</option>
-//                 {branchList.map((branch) => (
-//                   <option key={branch.id} value={branch.id}>
-//                     {branch.name}
-//                   </option>
-//                 ))}
-//               </select>
-//             </div>
-//             <div className="createuser-box">
-//               <label htmlFor="department">
-//                 Department<sup>*</sup>
-//               </label>
-//               <select
-//                 id="department"
-//                 name="department"
-//                 value={createUserForm.department}
-//                 onChange={handleFormChange}
-//                 className="candidate-input"
-//                 required
-//               >
-//                 <option value="">Select Department</option>
-//                 {departmentList.map((dept) => (
-//                   <option key={dept.id} value={dept.id}>
-//                     {dept.department_name}
-//                   </option>
-//                 ))}
-//               </select>
-//             </div>
+//             <Select
+//               label="Branch"
+//               id="branch"
+//               required
+//               value={createUserForm.branch}
+//               onChange={handleFormChange}
+//               options={branchList.map((b) => ({ id: b.id, name: b.name }))}
+//             />
+
+//             <Select
+//               label="Department"
+//               id="department"
+//               required
+//               value={createUserForm.department}
+//               onChange={handleFormChange}
+//               options={departmentList.map((d) => ({
+//                 id: d.id,
+//                 name: d.department_name,
+//               }))}
+//             />
 //           </div>
+
+//           {/* FOURTH ROW */}
 //           <div className="createuser-content">
-//             <div className="createuser-box">
-//               <label htmlFor="role">
-//                 Role<sup>*</sup>
-//               </label>
-//               <select
-//                   id="role"
-//                   name="desigrolenation"
-//                   value={createUserForm.role}
-//                   onChange={handleFormChange}
-//                   className="candidate-input"
-//                   required
-//                 >
-//                   <option value="">Select Designation</option>
-//                   {filteredRoles.map((role) => (
-//                     <option key={role.id} value={role.id}>
-//                       {role.role}
-//                     </option>
-//                   ))}
-//                 </select>
-//             </div>
-//             <div className="createuser-box">
-//               <label htmlFor="reporting_to">Reporting To</label>
-//               <input
-//                 id="reporting_to"
-//                 name="reporting_to"
-//                 type="text"
-//                 placeholder="9134554123"
-//                 value={createUserForm.reporting_to}
-//                 onChange={handleFormChange}
-//               />
-//             </div>
+//             <Select
+//               label="Role"
+//               id="role"
+//               required
+//               value={createUserForm.role}
+//               onChange={handleFormChange}
+//               options={filteredRoles.map((r) => ({ id: r.id, name: r.role }))}
+//             />
+
+//             <Input label="Reporting To" id="reporting_to"
+//               value={createUserForm.reporting_to}
+//               placeholder="Enter Reporting Manager"
+//               onChange={handleFormChange}
+//             />
 //           </div>
-          
-            
+
+//           {/* FIFTH ROW */}
 //           <div className="createuser-content">
-//             <div className="createuser-box">
-//               <label htmlFor="available_branches">Available Branches</label>
-//               <input
-//                 id="available_branches"
-//                 name="available_branches"
-//                 type="text"
-//                 placeholder="e.g., 1,2"
-//                 value={createUserForm.available_branches}
-//                 onChange={handleFormChange}
-//               />
-//             </div>
-//             <div className="createuser-box">
-//               <label htmlFor="employee_id">Employee ID</label>
-//               <input
-//                 id="employee_id"
-//                 name="employee_id"
-//                 type="text"
-//                 placeholder="Enter Employee ID"
-//                 value={createUserForm.employee_id}
-//                 onChange={handleFormChange}
-//                 disabled={editCreateUser}
-//               />
-//             </div>
+//             <Input label="Available Branches" id="available_branches"
+//               placeholder="e.g., 1,2"
+//               value={createUserForm.available_branches}
+//               onChange={handleFormChange}
+//             />
+
+//             <Input label="TMS User ID" id="tms_user_id"
+//               disabled={editCreateUser}
+//               placeholder="Enter TMS User Id"
+//               value={createUserForm.employee_id}
+//               onChange={handleFormChange}
+//             />
 //           </div>
+
+//           {/* ACTIONS */}
 //           <div className="createuser-submit-container">
-//             <nav>
-//               <button
-//                 type="button"
-//                 onClick={() => {
-//                   setshowCreateUser(false);
-//                   setedituser({});
-//                 }}
-//                 className="createuser-cancel"
-//               >
-//                 Cancel
-//               </button>
-//               <button type="submit" className="createuser-save">
-//                 Save
-//               </button>
-//             </nav>
+//             <button
+//               type="button"
+//               className="createuser-cancel"
+//               onClick={() => {
+//                 setshowCreateUser(false);
+//                 setedituser({});
+//               }}
+//             >
+//               Cancel
+//             </button>
+
+//             <button type="submit" className="createuser-save">
+//               Save
+//             </button>
 //           </div>
+
 //         </form>
 //       </div>
 //     </div>
 //   );
 // }
+
+// /* Small helper components (clean UI) */
+// const Input = ({ label, id, ...props }) => (
+//   <div className="createuser-box">
+//     <label htmlFor={id}>
+//       {label}
+//       {props.required && <sup>*</sup>}
+//     </label>
+//     <input id={id} {...props} />
+//   </div>
+// );
+
+// const Select = ({ label, id, options, ...props }) => (
+//   <div className="createuser-box">
+//     <label htmlFor={id}>
+//       {label}
+//       {props.required && <sup>*</sup>}
+//     </label>
+//     <select id={id} className="candidate-input" {...props}>
+//       <option value="">Select {label}</option>
+//       {options.map((opt) => (
+//         <option key={opt.id} value={opt.id}>
+//           {opt.name}
+//         </option>
+//       ))}
+//     </select>
+//   </div>
+// );
+
 import React, { useState, useEffect } from "react";
 import "./createUser.css";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
 import userApiProvider from "../../../network/user-api-provider";
-
 
 export default function CreateUser({
   showCreateUser,
-  setshowCreateUser,
   editCreateUser,
   edituser,
-  setedituser,
+  onClose, // ✅ parent-controlled close
 }) {
-  const navigate = useNavigate();
-
   const initialForm = {
     first_name: "",
     last_name: "",
@@ -443,7 +356,6 @@ export default function CreateUser({
   };
 
   const [createUserForm, setcreateUserForm] = useState(initialForm);
-
   const [branchList, setBranchList] = useState([]);
   const [departmentList, setDepartmentList] = useState([]);
   const [roleList, setRoleList] = useState([]);
@@ -452,39 +364,42 @@ export default function CreateUser({
   // =============================================
   // Prefill on Edit
   // =============================================
-  useEffect(() => {
-    if (!editCreateUser || !edituser?.id) {
-      setcreateUserForm(initialForm);
-      return;
-    }
+ useEffect(() => {
+  if (!editCreateUser || !edituser?.id) {
+    setcreateUserForm(initialForm);
+    return;
+  }
 
-    setcreateUserForm({
-      first_name: edituser.first_name || "",
-      last_name: edituser.last_name || "",
-      email: edituser.email || "",
-      contact_number: edituser.profile?.contact_number || "",
-      employee_id: edituser.profile?.employee_id || "",
-      branch: edituser.profile?.branch?.id || "",
-      department: edituser.profile?.department?.id || "",
-      role: edituser.profile?.role?.id || "",
-      reporting_to: edituser.profile?.reporting_to || "",
-      available_branches:
-        Array.isArray(edituser.profile?.available_branches)
-          ? edituser.profile.available_branches.join(", ")
-          : "",
-    });
-  }, [edituser, editCreateUser]);
+  setcreateUserForm({
+    first_name: edituser.first_name || "",
+    last_name: edituser.last_name || "",
+    email: edituser.email || "",
 
-  
+    contact_number: edituser.contact_number || "",
+    employee_id: edituser.employee_id || "",
+
+    branch: edituser.branch?.id || "",
+    department: edituser.department?.id || "",
+    role: edituser.role?.id || "",
+
+    reporting_to: edituser.reporting_to || "",
+
+    available_branches: Array.isArray(edituser.available_branches)
+      ? edituser.available_branches.join(", ")
+      : "",
+  });
+}, [edituser, editCreateUser]);
 
   // =============================================
-  // Fetch Dropdown Data
+  // Fetch dropdown data
   // =============================================
   useEffect(() => {
     const loadData = async () => {
       const branches = await userApiProvider.fetchBranches();
       const departments = await userApiProvider.fetchDepartments();
-      const roles = await userApiProvider.fetchRoles(createUserForm.department);
+      const roles = await userApiProvider.fetchRoles(
+        createUserForm.department
+      );
 
       setBranchList(branches);
       setDepartmentList(departments);
@@ -495,35 +410,31 @@ export default function CreateUser({
   }, [createUserForm.department]);
 
   // =============================================
-  // Filter Roles based on Department
+  // Filter roles by department
   // =============================================
   useEffect(() => {
-  if (!createUserForm.department || roleList.length === 0) {
-    setFilteredRoles([]);
-    return;
-  }
+    if (!createUserForm.department) {
+      setFilteredRoles([]);
+      return;
+    }
 
-  const selectedDept = departmentList.find(
-    (d) => Number(d.id) === Number(createUserForm.department)
-  );
+    const selectedDept = departmentList.find(
+      (d) => Number(d.id) === Number(createUserForm.department)
+    );
 
-  if (!selectedDept) {
-    setFilteredRoles([]);
-    return;
-  }
+    if (!selectedDept) return;
 
-  const deptName = selectedDept.department_name.toLowerCase();
+    const filtered = roleList.filter(
+      (r) =>
+        r.department_name?.toLowerCase() ===
+        selectedDept.department_name.toLowerCase()
+    );
 
-  const filtered = roleList.filter((role) =>
-    role.department_name?.toLowerCase() === deptName
-  );
-
-  setFilteredRoles(filtered);
-}, [createUserForm.department, roleList, departmentList]);
-
+    setFilteredRoles(filtered);
+  }, [createUserForm.department, roleList, departmentList]);
 
   // =============================================
-  // Handle Form Change
+  // Handle input change
   // =============================================
   const handleFormChange = (e) => {
     const { id, value } = e.target;
@@ -531,17 +442,17 @@ export default function CreateUser({
     setcreateUserForm((prev) => ({
       ...prev,
       [id]: value,
-      ...(id === "department" ? { role: "" } : {}), // reset role on department change
+      ...(id === "department" ? { role: "" } : {}),
     }));
   };
 
   // =============================================
-  // Submit Handler (Create + Edit)
+  // Submit handler
   // =============================================
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const baseData = {
+    const payload = {
       first_name: createUserForm.first_name,
       last_name: createUserForm.last_name,
       profile: {
@@ -554,50 +465,43 @@ export default function CreateUser({
           .split(",")
           .map((b) => b.trim())
           .filter(Boolean),
+        employee_id: createUserForm.employee_id,
       },
     };
 
-    let response = null;
-
-    if (editCreateUser) {
-      response = await userApiProvider.updateUser(edituser.id, baseData);
-    } else {
-      response = await userApiProvider.createUser({
-        ...baseData,
-        email: createUserForm.email,
-        password: "defaultPassword123",
-        profile: {
-          ...baseData.profile,
-          employee_id: createUserForm.employee_id,
-        },
-      });
-    }
+    const response = editCreateUser
+      ? await userApiProvider.updateUser(edituser.id, payload)
+      : await userApiProvider.createUser({
+          ...payload,
+          email: createUserForm.email,
+          password: "defaultPassword123",
+        });
 
     if (response) {
       toast.success(editCreateUser ? "User updated" : "User created");
-
-      setcreateUserForm(initialForm);
-      setedituser({});
-      setshowCreateUser(false);
-      navigate("/?tab=manageUsers");
+      onClose(); // ✅ close modal correctly
     }
   };
 
   // =============================================
-  // JSX UI Rendering
+  // UI
   // =============================================
   return (
-    <div className={`createuser-container ${showCreateUser ? "block" : "hidden"}`}>
+    <div className={`createuser-container ${showCreateUser ? "block" : ""}`}>
+      {/* CLOSE ICON */}
       <svg
         className="x-logo-createuser"
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 384 512"
-        onClick={() => {
-          setshowCreateUser(false);
-          setedituser({});
-        }}
+        onClick={onClose}
       >
-        <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
+        <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 
+        0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 
+        0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 
+        12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 
+        0L192 301.3 297.4 406.6c12.5 12.5 
+        32.8 12.5 45.3 0s12.5-32.8 
+        0-45.3L237.3 256 342.6 150.6z" />
       </svg>
 
       <div className="createuser-head">
@@ -606,46 +510,65 @@ export default function CreateUser({
 
       <div className="createuser-body">
         <form onSubmit={handleSubmit}>
-
-          {/* FIRST ROW */}
+          {/* ROW 1 */}
           <div className="createuser-content">
-            <Input label="First Name" required id="first_name"
+            <Input
+              label="First Name"
+              required
+              id="first_name"
               value={createUserForm.first_name}
+              placeholder="Enter Your First Name"
               onChange={handleFormChange}
             />
-            <Input label="Last Name" required id="last_name"
+            <Input
+              label="Last Name"
+              required
+              id="last_name"
               value={createUserForm.last_name}
+              placeholder="Enter Your Last Name"
               onChange={handleFormChange}
             />
           </div>
 
-          {/* SECOND ROW */}
+          {/* ROW 2 */}
           <div className="createuser-content">
-            <Input label="Email" required id="email" disabled={editCreateUser}
+            <Input
+              label="Email"
+              required
+              id="email"
+              disabled={editCreateUser}
               value={createUserForm.email}
+              placeholder="Enter Your Email"
               onChange={handleFormChange}
             />
-            <Input label="Contact Number" id="contact_number" type="number"
+            <Input
+              label="Contact Number"
+              id="contact_number"
+              type="number"
               value={createUserForm.contact_number}
+              placeholder="Enter Contact Number"
               onChange={handleFormChange}
             />
           </div>
 
-          {/* THIRD ROW */}
+          {/* ROW 3 */}
           <div className="createuser-content">
             <Select
               label="Branch"
-              id="branch"
               required
+              id="branch"
               value={createUserForm.branch}
               onChange={handleFormChange}
-              options={branchList.map((b) => ({ id: b.id, name: b.name }))}
+              options={branchList.map((b) => ({
+                id: b.id,
+                name: b.name,
+              }))}
             />
 
             <Select
               label="Department"
-              id="department"
               required
+              id="department"
               value={createUserForm.department}
               onChange={handleFormChange}
               options={departmentList.map((d) => ({
@@ -655,33 +578,44 @@ export default function CreateUser({
             />
           </div>
 
-          {/* FOURTH ROW */}
+          {/* ROW 4 */}
           <div className="createuser-content">
             <Select
               label="Role"
-              id="role"
               required
+              id="role"
               value={createUserForm.role}
               onChange={handleFormChange}
-              options={filteredRoles.map((r) => ({ id: r.id, name: r.role }))}
+              options={filteredRoles.map((r) => ({
+                id: r.id,
+                name: r.role,
+              }))}
             />
 
-            <Input label="Reporting To" id="reporting_to"
+            <Input
+              label="Reporting To"
+              id="reporting_to"
               value={createUserForm.reporting_to}
+              placeholder="Enter Reporting Manager"
               onChange={handleFormChange}
             />
           </div>
 
-          {/* FIFTH ROW */}
+          {/* ROW 5 */}
           <div className="createuser-content">
-            <Input label="Available Branches" id="available_branches"
-              placeholder="e.g., 1,2"
+            <Input
+              label="Available Branches"
+              id="available_branches"
+              placeholder="e.g. 1,2"
               value={createUserForm.available_branches}
               onChange={handleFormChange}
             />
 
-            <Input label="Employee ID" id="employee_id"
+            <Input
+              label="TMS User ID"
+              id="employee_id"
               disabled={editCreateUser}
+              placeholder="Enter TMS User Id"
               value={createUserForm.employee_id}
               onChange={handleFormChange}
             />
@@ -692,26 +626,21 @@ export default function CreateUser({
             <button
               type="button"
               className="createuser-cancel"
-              onClick={() => {
-                setshowCreateUser(false);
-                setedituser({});
-              }}
+              onClick={onClose}
             >
               Cancel
             </button>
-
             <button type="submit" className="createuser-save">
               Save
             </button>
           </div>
-
         </form>
       </div>
     </div>
   );
 }
 
-/* Small helper components (clean UI) */
+/* ---------- Helper Components ---------- */
 const Input = ({ label, id, ...props }) => (
   <div className="createuser-box">
     <label htmlFor={id}>
@@ -728,7 +657,7 @@ const Select = ({ label, id, options, ...props }) => (
       {label}
       {props.required && <sup>*</sup>}
     </label>
-    <select id={id} className="candidate-input" {...props}>
+    <select id={id} {...props}>
       <option value="">Select {label}</option>
       {options.map((opt) => (
         <option key={opt.id} value={opt.id}>

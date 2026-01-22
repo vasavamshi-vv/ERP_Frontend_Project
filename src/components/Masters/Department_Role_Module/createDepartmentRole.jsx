@@ -1,1016 +1,581 @@
-// import React, { useState, useEffect } from "react";
+// import React, { useEffect, useState } from "react";
 // import "./createDepartmentrole.css";
 // import { toast } from "react-toastify";
-// import axios from "axios";
+// import departmentRoleApiProvider from "../../../network/departmentRole-api-provider";
 
-// export default function createDepartmentRole({
-//   setShowDepartmentRole,
-//   setShowNewRole,
-//   setEditDepartmentRole,
+// export default function CreateDepartmentRole({
+//   showDepartmentRole,
 //   editDepartmentRole,
 //   editDept,
+//   onClose,
+//   setShowNewRole,
 //   setEditRoleOnly,
-//   setEditDept,
 //   setEditRole,
 // }) {
-//   const [isLoading, setIsLoading] = useState(false);
-//   const [rolesLoading, setRolesLoading] = useState(false);
-//   const persistedAuth = JSON.parse(localStorage.getItem("persist:root"));
-//   const authState = JSON.parse(persistedAuth.auth || "{}");
-//   const token = authState?.user?.token;
-
-//   const [createDepartmentForm, setcreateDepartmentForm] = useState({
+//   /* ===========================
+//      STATE
+//   ============================ */
+//   const initialForm = {
 //     department_name: "",
 //     code: "",
 //     branch: "",
 //     description: "",
-//   });
+//   };
 
+//   const [form, setForm] = useState(initialForm);
 //   const [roles, setRoles] = useState([]);
 //   const [branchList, setBranchList] = useState([]);
+//   const [isLoading, setIsLoading] = useState(false);
+//   const [rolesLoading, setRolesLoading] = useState(false);
 
+//   /* ===========================
+//      LOAD BRANCHES (ONCE)
+//   ============================ */
 //   useEffect(() => {
 //     const fetchBranches = async () => {
 //       try {
-//         const response = await axios.get("http://127.0.0.1:8000/api/branches/", {
-//           headers: {
-//             Authorization: `Token ${token}`,
-//             "Content-Type": "application/json",
-//           },
-//         });
-//         setBranchList(response.data);
-//       } catch (error) {
-//         console.error("Error fetching branches:", error);
+//         const res = await departmentRoleApiProvider.fetchBranches();
+//         setBranchList(res || []);
+//       } catch {
 //         toast.error("Failed to load branches");
 //       }
 //     };
-
 //     fetchBranches();
 //   }, []);
 
+//   /* ===========================
+//      PREFILL EDIT MODE
+//   ============================ */
 //   useEffect(() => {
-//     setcreateDepartmentForm(editDept);
-//   }, [editDept]);
+//     if (!editDepartmentRole || !editDept?.id) {
+//       setForm(initialForm);
+//       setRoles([]);
+//       return;
+//     }
 
-//   useEffect(() => {
-//   if (editDept) {
-//     // 1. Set the department form
-//     setcreateDepartmentForm({
+//     setForm({
 //       department_name: editDept.department_name || "",
 //       code: editDept.code || "",
-//       branch: typeof editDept.branch === "object" ? editDept.branch.id : editDept.branch || "",
+//       branch:
+//         typeof editDept.branch === "object"
+//           ? editDept.branch.id
+//           : editDept.branch || "",
 //       description: editDept.description || "",
 //     });
 
-//     // 2. Fetch roles for edit mode
-//     if (editDept.id) {
-//       fetchRoles(editDept.id);
-//     }
-//   } else {
-//     // No editDept → fetch example roles for create mode
-//     fetchExampleRoles();
-//   }
-// }, [editDept]);
+//     fetchRoles(editDept.id);
+//   }, [editDepartmentRole, editDept]);
 
-
-//   const fetchRoles = async (departmentId) => {
-//     setRolesLoading(true);
-//     try {
-//       const response = await axios.get(
-//         `http://127.0.0.1:8000/api/roles/?department=${departmentId}`,
-//         {
-//           headers: {
-//             Authorization: `Token ${token}`,
-//             "Content-Type": "application/json",
-//           },
-//         }
-//       );
-//       setRoles(response.data.roles);
-//     } catch (error) {
-//       console.error("Error fetching roles:", error);
-//       toast.error("Failed to load roles");
-//     } finally {
-//       setRolesLoading(false);
-//     }
-//   };
-
-//   const fetchExampleRoles = async () => {
-//     setRolesLoading(true);
-//     try {
-//       const response = await axios.get("http://127.0.0.1:8000/api/roles/?page=1&per_page=3", {
-//         headers: {
-//           Authorization: `Token ${token}`,
-//           "Content-Type": "application/json",
-//         },
-//       });
-//       setRoles(response.data.roles); // or response.data if not wrapped
-//     } catch (error) {
-//       console.error("Error fetching example roles:", error);
-//       toast.error("Failed to load example roles");
-//     } finally {
-//       setRolesLoading(false);
-//     }
-//   };
-
-//   const handleCreateDepartmentChange = (e) => {
-//     const { id, value } = e.target;
-
-//     setcreateDepartmentForm((prev) => ({
-//       ...prev,
-//       [id]: id === "branch" ? parseInt(value) : value,
-//     }));
-//   };
-
-//   const deleteRole = async (roleId) => {
-//     const okDel = window.confirm("Are you sure you want to delete this role?");
-
-//     if (okDel) {
-//       try {
-//         await axios.delete(`http://127.0.0.1:8000/api/roles/${roleId}/`, {
-//           headers: {
-//             Authorization: `Token ${token}`,
-//             "Content-Type": "application/json",
-//           },
-//         });
-
-//         // Refresh roles list
-//         if (editDept?.id) {
-//           fetchRoles(editDept.id);
-//         }
-//         toast.success("Role deleted successfully!");
-//       } catch (error) {
-//         console.error("Error deleting role:", error);
-//         toast.error("Failed to delete role");
-//       }
-//     }
-//   };
-
-//   async function handleNewDepartmentSubmit(e) {
-//     e.preventDefault();
-//     setIsLoading(true);
-
-//     try {
-//       if (!token) {
-//         throw new Error("No authentication token found");
-//       }
-
-//       const config = {
-//         headers: {
-//           Authorization: `Token ${token}`,
-//           "Content-Type": "application/json",
-//         },
-//       };
-
-//       const url = "http://127.0.0.1:8000/api/departments/";
-//       const data = createDepartmentForm;
-
-//       // Check if we're editing or creating
-//       const method = editDepartmentRole ? "put" : "post";
-
-//       // If editing, we might need to include the ID in the URL
-//       const finalUrl = editDepartmentRole && editDept.id
-//         ? `${url}${editDept.id}/`
-//         : url;
-
-//       const res = await axios[method](finalUrl, data, config);
-
-//       toast.success(
-//         editDepartmentRole
-//           ? "Department updated successfully!"
-//           : "Department created successfully!"
-//       );
-
-//       // Reset form and close modal
-//       setcreateDepartmentForm({
-//         department_name: "",
-//         code: "",
-//         branch: "",
-//         description: "",
-//       });
-
-//       setShowDepartmentRole(false);
-//       setEditDept({});
-
-//     } catch (err) {
-//       console.error("Department operation failed", err.response?.data || err.message);
-//       toast.error(
-//         err.response?.data?.message ||
-//         (editDepartmentRole
-//           ? "Failed to update department."
-//           : "Failed to create department.")
-//       );
-//     } finally {
-//       setIsLoading(false);
-//     }
-//   }
-
-//   return (
-//     <>
-//       <div className="create-department-role-container">
-//         <svg
-//           className="x-logo-create-department"
-//           xmlns="http://www.w3.org/2000/svg"
-//           viewBox="0 0 384 512"
-//           onClick={(e) => {
-//             e.preventDefault();
-//             setEditDepartmentRole(false);
-//             setShowDepartmentRole(false);
-//             setEditDept({});
-//           }}
-//         >
-//           <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
-//         </svg>
-//         <div className="create-department-head">
-//           <p>{editDepartmentRole ? "Edit" : "Create New"} Department & roles</p>
-//         </div>
-//         <div className="create-department-body">
-//           <form onSubmit={handleNewDepartmentSubmit}>
-//             <div className="create-department-content">
-//               <div className="create-department-box">
-//                 <label htmlFor="department_name">
-//                   Department Name<sup>*</sup>
-//                 </label>
-//                 <input
-//                   id="department_name"
-//                   name="department_name"
-//                   type="text"
-//                   placeholder="Sales"
-//                   value={createDepartmentForm.department_name}
-//                   onChange={handleCreateDepartmentChange}
-//                   required
-//                 />
-//               </div>
-//               <div className="create-department-box">
-//                 <label htmlFor="code">
-//                   Code<sup>*</sup>
-//                 </label>
-//                 <input
-//                   id="code"
-//                   name="code"
-//                   type="text"
-//                   placeholder="Enter Code"
-//                   value={createDepartmentForm.code}
-//                   onChange={handleCreateDepartmentChange}
-//                   required
-//                 />
-//               </div>
-//             </div>
-//             <div className="create-department-content">
-//               <div className="create-department-box" id="create-department-box-fullwidth">
-//                 <label htmlFor="branch">
-//                   Branch<sup>*</sup>
-//                 </label>
-//                 <select
-//                   id="branch"
-//                   name="branch"
-//                   onChange={handleCreateDepartmentChange}
-//                   value={createDepartmentForm.branch}
-//                   required
-//                 >
-//                   <option value="">Select a branch</option>
-//                   {branchList.map((branch) => (
-//                     <option key={branch.id} value={branch.id}>
-//                       {branch.name}
-//                     </option>
-//                   ))}
-//                 </select>
-//               </div>
-//             </div>
-
-//             <div className="create-department-content">
-//               <div
-//                 className="create-department-box"
-//                 id="create-department-box-fullwidth"
-//               >
-//                 <label htmlFor="description">Description</label>
-//                 <input
-//                   id="description"
-//                   name="description"
-//                   type="text"
-//                   placeholder="Text content"
-//                   value={createDepartmentForm.description}
-//                   onChange={handleCreateDepartmentChange}
-//                 />
-//               </div>
-//             </div>
-//             <div className="create-department-content">
-//               <div className="display-role-cointainer-title">
-//                 <nav>
-//                   <p>Roles</p>
-//                   <button
-//                     onClick={(e) => {
-//                       e.preventDefault();
-//                       setShowNewRole(true);
-//                     }}
-//                   >
-//                     + Add New
-//                   </button>
-//                 </nav>
-//               </div>
-//             </div>
-//             <div className="create-department-content">
-//               <div className="display-role-cointainer">
-//                 <table>
-//                   <thead className="display-role-tablehead">
-//                     <tr>
-//                       <th id="display-rolename-width">Role Name</th>
-//                       <th id="display-description-width">Description</th>
-//                       <th id="display-action-width">Action</th>
-//                     </tr>
-//                   </thead>
-//                   <tbody className="display-role-tablebody">
-//                     {rolesLoading ? (
-//                       <tr>
-//                         <td colSpan="3">Loading roles...</td>
-//                       </tr>
-//                     ) : roles.length > 0 ? (
-//                       roles.map((role) => (
-//                         <tr key={role.id}>
-//                           <td id="display-rolename-width">{role.role}</td>
-//                           <td id="display-description-width">
-//                             {role.description || "No description"}
-//                           </td>
-//                           <td id="display-action-width">
-//                             <svg
-//                               className="dot-logo-department"
-//                               xmlns="http://www.w3.org/2000/svg"
-//                               viewBox="0 0 128 512"
-//                             >
-//                               <path d="M64 360a56 56 0 1 0 0 112 56 56 0 1 0 0-112zm0-160a56 56 0 1 0 0 112 56 56 0 1 0 0-112zM120 96A56 56 0 1 0 8 96a56 56 0 1 0 112 0z" />
-//                             </svg>
-//                             <nav className="departmentrole-dot-container">
-//                               <div
-//                                 onClick={() => {
-//                                   setEditRole(role);
-//                                   setEditRoleOnly(true);
-//                                   setShowNewRole(true);
-//                                 }}
-//                               >
-//                                 Edit
-//                               </div>
-//                               <div
-//                                 onClick={() => {
-//                                   deleteRole(role.id);
-//                                 }}
-//                               >
-//                                 Delete
-//                               </div>
-//                             </nav>
-//                           </td>
-//                         </tr>
-//                       ))
-//                     ) : (
-//                       <tr>
-//                         <td colSpan="3">
-//                           {editDepartmentRole ? "No roles found for this department" : "Save department to add roles"}
-//                         </td>
-//                       </tr>
-//                     )}
-//                   </tbody>
-//                 </table>
-//               </div>
-//             </div>
-//             <div className="create-department-submit-container">
-//               <nav>
-//                 <button
-//                   onClick={(e) => {
-//                     e.preventDefault();
-//                     setEditDepartmentRole(false);
-//                     setShowDepartmentRole(false);
-//                   }}
-//                   className="create-department-cancel"
-//                 >
-//                   Cancel
-//                 </button>
-//                 <button type="submit" className="create-department-save">
-//                   Save
-//                 </button>
-//               </nav>
-//             </div>
-//           </form>
-//         </div>
-//       </div>
-//     </>
-//   );
-// }
-// import React, { useState, useEffect } from "react";
-// import "./createDepartmentrole.css";
-// import { toast } from "react-toastify";
-// import departmentRoleApiProvider from "../../../network/departmentRole-api-provider"; // import provider
-
-// export default function CreateDepartmentRole({
-//   setShowDepartmentRole,
-//   setShowNewRole,
-//   setEditDepartmentRole,
-//   editDepartmentRole,
-//   editDept,
-//   setEditRoleOnly,
-//   setEditDept,
-//   setEditRole,
-// }) {
-//   const [isLoading, setIsLoading] = useState(false);
-//   const [rolesLoading, setRolesLoading] = useState(false);
-
-//   const [createDepartmentForm, setCreateDepartmentForm] = useState({
-//     department_name: "",
-//     code: "",
-//     branch: "",
-//     description: "",
-//   });
-
-//   const [roles, setRoles] = useState([]);
-//   const [branchList, setBranchList] = useState([]);
-
-//   // Fetch branches on mount
-//   useEffect(() => {
-//     const fetchBranches = async () => {
-//       setRolesLoading(true);
-//       const branches = await departmentRoleApiProvider.fetchBranches();
-//       setBranchList(branches);
-//       setRolesLoading(false);
-//     };
-//     fetchBranches();
-//   }, []);
-
-//   // Set form for edit mode
-//   useEffect(() => {
-//     if (editDept) {
-//       setCreateDepartmentForm({
-//         department_name: editDept.department_name || "",
-//         code: editDept.code || "",
-//         branch: typeof editDept.branch === "object" ? editDept.branch.id : editDept.branch || "",
-//         description: editDept.description || "",
-//       });
-
-//       if (editDept.id) fetchRoles(editDept.id);
-//     } else {
-//       fetchExampleRoles();
-//     }
-//   }, [editDept]);
-
-//   // Fetch roles for a department
+//   /* ===========================
+//      FETCH ROLES
+//   ============================ */
 //   const fetchRoles = async (departmentId) => {
 //     setRolesLoading(true);
 //     try {
 //       const res = await departmentRoleApiProvider.fetchRoles(departmentId);
-//       setRoles(res);
-//     } catch (err) {
+//       setRoles(res || []);
+//     } catch {
 //       toast.error("Failed to load roles");
-//       console.error(err);
 //     } finally {
 //       setRolesLoading(false);
 //     }
 //   };
 
-//   // Fetch example roles for create mode
-//   const fetchExampleRoles = async () => {
-//     setRolesLoading(true);
-//     try {
-//       const res = await departmentRoleApiProvider.fetchRoles();
-//       setRoles(res.slice(0, 3)); // take first 3 as example
-//     } catch (err) {
-//       toast.error("Failed to load example roles");
-//       console.error(err);
-//     } finally {
-//       setRolesLoading(false);
-//     }
-//   };
-
-//   const handleCreateDepartmentChange = (e) => {
+//   /* ===========================
+//      FORM HANDLERS
+//   ============================ */
+//   const handleChange = (e) => {
 //     const { id, value } = e.target;
-//     setCreateDepartmentForm((prev) => ({
+//     setForm((prev) => ({
 //       ...prev,
-//       [id]: id === "branch" ? parseInt(value) : value,
+//       [id]: id === "branch" ? Number(value) : value,
 //     }));
 //   };
 
-//   const deleteRole = async (roleId) => {
-//     if (!window.confirm("Are you sure you want to delete this role?")) return;
-
-//     try {
-//       await departmentRoleApiProvider.deleteRole(roleId);
-//       if (editDept?.id) fetchRoles(editDept.id);
-//       toast.success("Role deleted successfully!");
-//     } catch (err) {
-//       console.error(err);
-//       toast.error("Failed to delete role");
-//     }
-//   };
-
-//   const handleNewDepartmentSubmit = async (e) => {
+//   const handleSubmit = async (e) => {
 //     e.preventDefault();
 //     setIsLoading(true);
 
 //     try {
-//       if (editDepartmentRole && editDept.id) {
-//         await departmentRoleApiProvider.updateDepartment(editDept.id, createDepartmentForm);
-//         toast.success("Department updated successfully!");
+//       if (editDepartmentRole) {
+//         await departmentRoleApiProvider.updateDepartment(editDept.id, form);
+//         toast.success("Department updated successfully");
 //       } else {
-//         await departmentRoleApiProvider.createDepartment(createDepartmentForm);
-//         toast.success("Department created successfully!");
+//         await departmentRoleApiProvider.createDepartment(form);
+//         toast.success("Department created successfully");
 //       }
-
-//       setCreateDepartmentForm({
-//         department_name: "",
-//         code: "",
-//         branch: "",
-//         description: "",
-//       });
-
-//       setShowDepartmentRole(false);
-//       setEditDept({});
-//     } catch (err) {
-//       console.error(err);
+//       onClose();
+//     } catch {
 //       toast.error("Failed to save department");
 //     } finally {
 //       setIsLoading(false);
 //     }
 //   };
 
+//   /* ===========================
+//      ROLE UI (CSS SAFE)
+//   ============================ */
+//   const renderRolesUI = () => {
 //   return (
-//     <div className="create-department-role-container">
+//     <table>
+//       <thead className="display-role-tablehead">
+//         <tr>
+//           <th id="display-rolename-width">Role Name</th>
+//           <th id="display-description-width">Description</th>
+//           <th id="display-action-width">Action</th>
+//         </tr>
+//       </thead>
+
+//       <tbody className="display-role-tablebody">
+//         {!editDepartmentRole ? (
+//           <tr>
+//             <td colSpan="3" style={{ textAlign: "center" }}>
+//               Save department to add roles
+//             </td>
+//           </tr>
+//         ) : rolesLoading ? (
+//           <tr>
+//             <td colSpan="3" style={{ textAlign: "center" }}>
+//               Loading roles...
+//             </td>
+//           </tr>
+//         ) : roles.length === 0 ? (
+//           <tr>
+//             <td colSpan="3" style={{ textAlign: "center" }}>
+//               No roles found
+//             </td>
+//           </tr>
+//         ) : (
+//           roles.map((role) => (
+//             <tr key={role.id}>
+//               <td id="display-rolename-width">{role.role}</td>
+//               <td id="display-description-width">
+//                 {role.description || "—"}
+//               </td>
+//               <td id="display-action-width">
+//                 <span
+//                   className="role-edit"
+//                   onClick={() => {
+//                     setEditRole(role);
+//                     setEditRoleOnly(true);
+//                     setShowNewRole(true);
+//                     onClose();
+//                   }}
+//                 >
+//                   Edit
+//                 </span>
+//               </td>
+//             </tr>
+//           ))
+//         )}
+//       </tbody>
+//     </table>
+//   );
+// };
+
+
+//   /* ===========================
+//      UI
+//   ============================ */
+//   return (
+//     <div
+//       className={`create-department-role-container ${
+//         showDepartmentRole ? "block" : ""
+//       }`}
+//     >
+//       {/* CLOSE */}
 //       <svg
 //         className="x-logo-create-department"
 //         xmlns="http://www.w3.org/2000/svg"
 //         viewBox="0 0 384 512"
-//         onClick={() => {
-//           setEditDepartmentRole(false);
-//           setShowDepartmentRole(false);
-//           setEditDept({});
-//         }}
+//         onClick={onClose}
 //       >
-//         <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
+//         <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 
+//         0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 
+//         0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 
+//         12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 
+//         0L192 301.3 297.4 406.6c12.5 12.5 
+//         32.8 12.5 45.3 0s12.5-32.8 
+//         0-45.3L237.3 256 342.6 150.6z" />
 //       </svg>
 
 //       <div className="create-department-head">
-//         <p>{editDepartmentRole ? "Edit" : "Create New"} Department & roles</p>
+//         <p>{editDepartmentRole ? "Edit" : "Create New"} Department</p>
 //       </div>
 
 //       <div className="create-department-body">
-//         <form onSubmit={handleNewDepartmentSubmit}>
-//           {/* Department Name & Code */}
+//         <form onSubmit={handleSubmit}>
+//           {/* FORM */}
 //           <div className="create-department-content">
-//             <div className="create-department-box">
-//               <label htmlFor="department_name">Department Name<sup>*</sup></label>
-//               <input
-//                 id="department_name"
-//                 type="text"
-//                 value={createDepartmentForm.department_name}
-//                 onChange={handleCreateDepartmentChange}
-//                 required
-//               />
-//             </div>
-//             <div className="create-department-box">
-//               <label htmlFor="code">Code<sup>*</sup></label>
-//               <input
-//                 id="code"
-//                 type="text"
-//                 value={createDepartmentForm.code}
-//                 onChange={handleCreateDepartmentChange}
-//                 required
-//               />
-//             </div>
+//             <Input
+//               id="department_name"
+//               label="Department Name"
+//               required
+//               value={form.department_name}
+//               onChange={handleChange}
+//             />
+//             <Input
+//               id="code"
+//               label="Code"
+//               required
+//               value={form.code}
+//               onChange={handleChange}
+//             />
 //           </div>
 
-//           {/* Branch */}
 //           <div className="create-department-content">
-//             <div className="create-department-box" id="create-department-box-fullwidth">
-//               <label htmlFor="branch">Branch<sup>*</sup></label>
-//               <select
-//                 id="branch"
-//                 value={createDepartmentForm.branch}
-//                 onChange={handleCreateDepartmentChange}
-//                 required
-//               >
-//                 <option value="">Select a branch</option>
-//                 {branchList.map((b) => (
-//                   <option key={b.id} value={b.id}>{b.name}</option>
-//                 ))}
-//               </select>
-//             </div>
+//             <Select
+//               id="branch"
+//               label="Branch"
+//               required
+//               value={form.branch}
+//               onChange={handleChange}
+//               options={branchList}
+//             />
 //           </div>
 
-//           {/* Description */}
 //           <div className="create-department-content">
-//             <div className="create-department-box" id="create-department-box-fullwidth">
-//               <label htmlFor="description">Description</label>
-//               <input
-//                 id="description"
-//                 type="text"
-//                 value={createDepartmentForm.description}
-//                 onChange={handleCreateDepartmentChange}
-//               />
-//             </div>
+//             <Input
+//               id="description"
+//               label="Description"
+//               value={form.description}
+//               onChange={handleChange}
+//             />
 //           </div>
 
-//           {/* Roles */}
-//           <div className="create-department-content">
+//           {/* ROLES */}
+//           {/* <div className="create-department-content">
 //             <div className="display-role-cointainer-title">
 //               <nav>
 //                 <p>Roles</p>
 //                 <button
-//                   onClick={(e) => {
-//                     e.preventDefault();
+//                   type="button"
+//                   disabled={!editDepartmentRole}
+//                   className={!editDepartmentRole ? "btn-disabled" : ""}
+//                   onClick={() => {
+//                     setEditRole({});
+//                     setEditRoleOnly(false);
 //                     setShowNewRole(true);
+//                     onClose(); // 🔥 required
 //                   }}
 //                 >
-//                   + Add New
+//                   + Add Role
 //                 </button>
 //               </nav>
 //             </div>
 
 //             <div className="display-role-cointainer">
-//               <table>
-//                 <thead>
-//                   <tr>
-//                     <th>Role Name</th>
-//                     <th>Description</th>
-//                     <th>Action</th>
-//                   </tr>
-//                 </thead>
-//                 <tbody>
-//                   {rolesLoading ? (
-//                     <tr><td colSpan="3">Loading roles...</td></tr>
-//                   ) : roles.length > 0 ? (
-//                     roles.map((role) => (
-//                       <tr key={role.id}>
-//                         <td>{role.role}</td>
-//                         <td>{role.description || "No description"}</td>
-//                         <td>
-//                           <div className="departmentrole-dot-container">
-//                             <div onClick={() => { setEditRole(role); setEditRoleOnly(true); setShowNewRole(true); }}>Edit</div>
-//                             <div onClick={() => deleteRole(role.id)}>Delete</div>
-//                           </div>
-//                         </td>
-//                       </tr>
-//                     ))
-//                   ) : (
-//                     <tr><td colSpan="3">{editDepartmentRole ? "No roles for this department" : "Save department to add roles"}</td></tr>
-//                   )}
-//                 </tbody>
-//               </table>
+//               {renderRolesUI()}
 //             </div>
-//           </div>
+//           </div> */}
+//           {/* ROLES SECTION */}
+// <div className="create-department-role-section">
+//   <div className="display-role-cointainer-title">
+//     <nav>
+//       <p>Roles</p>
 
-//           {/* Submit Buttons */}
+//       <button
+//         type="button"
+//         disabled={!editDepartmentRole}
+//         className={!editDepartmentRole ? "btn-disabled" : ""}
+//         onClick={() => {
+//           setEditRole({});
+//           setEditRoleOnly(false);
+//           setShowNewRole(true);
+//           onClose();
+//         }}
+//       >
+//         + Add Role
+//       </button>
+//     </nav>
+//   </div>
+
+//   <div className="display-role-cointainer">
+//     {renderRolesUI()}
+//   </div>
+// </div>
+
+
+//           {/* ACTIONS */}
 //           <div className="create-department-submit-container">
-//             <nav>
-//               <button
-//                 onClick={(e) => {
-//                   e.preventDefault();
-//                   setEditDepartmentRole(false);
-//                   setShowDepartmentRole(false);
-//                   setEditDept({});
-//                 }}
-//                 className="create-department-cancel"
-//               >
-//                 Cancel
-//               </button>
-//               <button type="submit" className="create-department-save" disabled={isLoading}>
-//                 {isLoading ? "Saving..." : "Save"}
-//               </button>
-//             </nav>
+//             <button
+//               type="button"
+//               className="create-department-cancel"
+//               onClick={onClose}
+//             >
+//               Cancel
+//             </button>
+//             <button
+//               type="submit"
+//               className="create-department-save"
+//               disabled={isLoading}
+//             >
+//               {isLoading ? "Saving..." : "Save"}
+//             </button>
 //           </div>
 //         </form>
 //       </div>
 //     </div>
 //   );
 // }
-import React, { useState, useEffect } from "react";
+
+// /* ===========================
+//    HELPERS (CSS FRIENDLY)
+// =========================== */
+// const Input = ({ label, id, ...props }) => (
+//   <div className="create-department-box">
+//     <label htmlFor={id}>
+//       {label} {props.required && <sup>*</sup>}
+//     </label>
+//     <input id={id} {...props} />
+//   </div>
+// );
+
+// const Select = ({ label, id, options, ...props }) => (
+//   <div className="create-department-box" id="create-department-box-fullwidth">
+//     <label htmlFor={id}>
+//       {label} {props.required && <sup>*</sup>}
+//     </label>
+//     <select id={id} {...props}>
+//       <option value="">Select {label}</option>
+//       {options.map((o) => (
+//         <option key={o.id} value={o.id}>
+//           {o.name}
+//         </option>
+//       ))}
+//     </select>
+//   </div>
+// );
+
+import React, { useEffect, useState } from "react";
 import "./createDepartmentrole.css";
 import { toast } from "react-toastify";
 import departmentRoleApiProvider from "../../../network/departmentRole-api-provider";
 
 export default function CreateDepartmentRole({
-  setShowDepartmentRole,
-  setShowNewRole,
-  setEditDepartmentRole,
+  showDepartmentRole,
   editDepartmentRole,
   editDept,
+  onClose,
+  setShowNewRole,
   setEditRoleOnly,
-  setEditDept,
   setEditRole,
 }) {
-  const [isLoading, setIsLoading] = useState(false);
-  const [rolesLoading, setRolesLoading] = useState(false);
-
-  const [createDepartmentForm, setCreateDepartmentForm] = useState({
+  const initialForm = {
     department_name: "",
     code: "",
     branch: "",
     description: "",
-  });
+  };
 
+  const [form, setForm] = useState(initialForm);
   const [roles, setRoles] = useState([]);
   const [branchList, setBranchList] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [rolesLoading, setRolesLoading] = useState(false);
 
+  /* LOAD BRANCHES */
   useEffect(() => {
-    const fetchBranches = async () => {
-      setRolesLoading(true);
-      const branches = await departmentRoleApiProvider.fetchBranches();
-      setBranchList(branches);
-      setRolesLoading(false);
-    };
-    fetchBranches();
+    departmentRoleApiProvider
+      .fetchBranches()
+      .then((res) => setBranchList(res || []))
+      .catch(() => toast.error("Failed to load branches"));
   }, []);
 
+  /* EDIT MODE PREFILL */
   useEffect(() => {
-    if (editDept) {
-      setCreateDepartmentForm({
-        department_name: editDept.department_name || "",
-        code: editDept.code || "",
-        branch:
-          typeof editDept.branch === "object"
-            ? editDept.branch.id
-            : editDept.branch || "",
-        description: editDept.description || "",
-      });
-
-      if (editDept.id) fetchRoles(editDept.id);
-    } else {
-      fetchExampleRoles();
+    if (!editDept?.id) {
+      setForm(initialForm);
+      setRoles([]);
+      return;
     }
+
+    setForm({
+      department_name: editDept.department_name || "",
+      code: editDept.code || "",
+      branch:
+        typeof editDept.branch === "object"
+          ? editDept.branch.id
+          : editDept.branch || "",
+      description: editDept.description || "",
+    });
+
+    fetchRoles(editDept.id);
   }, [editDept]);
 
-  const fetchRoles = async (departmentId) => {
+  const fetchRoles = async (id) => {
     setRolesLoading(true);
     try {
-      const res = await departmentRoleApiProvider.fetchRoles(departmentId);
-      setRoles(res);
-    } catch (err) {
+      const res = await departmentRoleApiProvider.fetchRoles(id);
+      setRoles(res || []);
+    } catch {
       toast.error("Failed to load roles");
     } finally {
       setRolesLoading(false);
     }
   };
 
-  const fetchExampleRoles = async () => {
-    setRolesLoading(true);
-    try {
-      const res = await departmentRoleApiProvider.fetchRoles();
-      setRoles(res.slice(0, 3));
-    } catch (err) {
-      toast.error("Failed to load example roles");
-    } finally {
-      setRolesLoading(false);
-    }
-  };
-
-  const handleCreateDepartmentChange = (e) => {
+  const handleChange = (e) => {
     const { id, value } = e.target;
-    setCreateDepartmentForm((prev) => ({
-      ...prev,
-      [id]: id === "branch" ? parseInt(value) : value,
-    }));
+    setForm((p) => ({ ...p, [id]: id === "branch" ? Number(value) : value }));
   };
 
-  const deleteRole = async (roleId) => {
-    if (!window.confirm("Are you sure you want to delete this role?")) return;
-
-    try {
-      await departmentRoleApiProvider.deleteRole(roleId);
-      if (editDept?.id) fetchRoles(editDept.id);
-      toast.success("Role deleted successfully!");
-    } catch (err) {
-      toast.error("Failed to delete role");
-    }
-  };
-
-  const handleNewDepartmentSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-
     try {
-      if (editDepartmentRole && editDept.id) {
-        await departmentRoleApiProvider.updateDepartment(
-          editDept.id,
-          createDepartmentForm
-        );
-        toast.success("Department updated successfully!");
+      if (editDept?.id) {
+        await departmentRoleApiProvider.updateDepartment(editDept.id, form);
+        toast.success("Department updated");
       } else {
-        await departmentRoleApiProvider.createDepartment(createDepartmentForm);
-        toast.success("Department created successfully!");
+        await departmentRoleApiProvider.createDepartment(form);
+        toast.success("Department created");
       }
-
-      setCreateDepartmentForm({
-        department_name: "",
-        code: "",
-        branch: "",
-        description: "",
-      });
-
-      setShowDepartmentRole(false);
-      setEditDept({});
-    } catch (err) {
-      toast.error("Failed to save department");
+      onClose();
+    } catch {
+      toast.error("Save failed");
     } finally {
       setIsLoading(false);
     }
   };
 
+  const renderRolesUI = () => (
+    <table>
+      <thead className="display-role-tablehead">
+        <tr>
+          <th className="display-rolename-width">Role Name</th>
+          <th className="display-description-width">Description</th>
+          <th className="display-action-width">Action</th>
+        </tr>
+      </thead>
+
+      <tbody className="display-role-tablebody">
+        {!editDept?.id ? (
+          <tr>
+            <td colSpan="3" align="center">
+              Save department to add roles
+            </td>
+          </tr>
+        ) : rolesLoading ? (
+          <tr>
+            <td colSpan="3" align="center">
+              Loading roles...
+            </td>
+          </tr>
+        ) : roles.length === 0 ? (
+          <tr>
+            <td colSpan="3" align="center">
+              No roles found
+            </td>
+          </tr>
+        ) : (
+          roles.map((role) => (
+            <tr key={role.id}>
+              <td className="display-rolename-width">{role.role}</td>
+              <td className="display-description-width">
+                {role.description || "—"}
+              </td>
+              <td className="display-action-width">
+                <span
+                  className="role-edit"
+                  onClick={() => {
+                    setEditRole(role);
+                    setEditRoleOnly(true);
+                    setShowNewRole(true);
+                  }}
+                >
+                  Edit
+                </span>
+              </td>
+            </tr>
+          ))
+        )}
+      </tbody>
+    </table>
+  );
+
   return (
-    <>
-      <div className="create-department-role-container">
-        <svg
-          className="x-logo-create-department"
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 384 512"
-          onClick={() => {
-            setEditDepartmentRole(false);
-            setShowDepartmentRole(false);
-            setEditDept({});
-          }}
-        >
-          <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
-        </svg>
+    <div className={`create-department-role-container ${showDepartmentRole ? "block" : ""}`}>
+      <svg className="x-logo-create-department" viewBox="0 0 384 512" onClick={onClose}>
+        <path d="M342.6 150.6L192 301.3 41.4 150.6" />
+      </svg>
 
-        <div className="create-department-head">
-          <p>{editDepartmentRole ? "Edit" : "Create New"} Department & roles</p>
-        </div>
-
-        <div className="create-department-body">
-          <form onSubmit={handleNewDepartmentSubmit}>
-            <div className="create-department-content">
-              <div className="create-department-box">
-                <label htmlFor="department_name">
-                  Department Name<sup>*</sup>
-                </label>
-                <input
-                  id="department_name"
-                  type="text"
-                  placeholder="Sales"
-                  value={createDepartmentForm.department_name}
-                  onChange={handleCreateDepartmentChange}
-                  required
-                />
-              </div>
-
-              <div className="create-department-box">
-                <label htmlFor="code">
-                  Code<sup>*</sup>
-                </label>
-                <input
-                  id="code"
-                  type="text"
-                  placeholder="Enter Code"
-                  value={createDepartmentForm.code}
-                  onChange={handleCreateDepartmentChange}
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="create-department-content">
-              <div
-                className="create-department-box"
-                id="create-department-box-fullwidth"
-              >
-                <label htmlFor="branch">
-                  Branch<sup>*</sup>
-                </label>
-                <select
-                  id="branch"
-                  value={createDepartmentForm.branch}
-                  onChange={handleCreateDepartmentChange}
-                  required
-                >
-                  <option value="">Select a branch</option>
-                  {branchList.map((branch) => (
-                    <option key={branch.id} value={branch.id}>
-                      {branch.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            <div className="create-department-content">
-              <div
-                className="create-department-box"
-                id="create-department-box-fullwidth"
-              >
-                <label htmlFor="description">Description</label>
-                <input
-                  id="description"
-                  type="text"
-                  placeholder="Text content"
-                  value={createDepartmentForm.description}
-                  onChange={handleCreateDepartmentChange}
-                />
-              </div>
-            </div>
-
-            {/* ===== Roles Section (Perfectly matched UI) ===== */}
-            <div className="create-department-content">
-              <div className="display-role-cointainer-title">
-                <nav>
-                <p>Roles</p>
-                <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setShowNewRole(true);         // Open create role modal
-                    setShowDepartmentRole(false); // Close department modal
-                    setEditDepartmentRole(false); // Ensure edit mode resets
-                  }}
-                >
-                  + Add New
-                </button>
-               </nav>
-              </div>
-            </div>
-
-            <div className="create-department-content">
-              <div className="display-role-cointainer">
-                <table>
-                  <thead className="display-role-tablehead">
-                    <tr>
-                      <th id="display-rolename-width">Role Name</th>
-                      <th id="display-description-width">Description</th>
-                      <th id="display-action-width">Action</th>
-                    </tr>
-                  </thead>
-
-                  <tbody className="display-role-tablebody">
-                    {rolesLoading ? (
-                      <tr>
-                        <td colSpan="3">Loading roles...</td>
-                      </tr>
-                    ) : roles.length > 0 ? (
-                      roles.map((role) => (
-                        <tr key={role.id}>
-                          <td id="display-rolename-width">{role.role}</td>
-                          <td id="display-description-width">
-                            {role.description || "No description"}
-                          </td>
-
-                          <td id="display-action-width">
-                            <svg
-                              className="dot-logo-department"
-                              xmlns="http://www.w3.org/2000/svg"
-                              viewBox="0 0 128 512"
-                            >
-                              <path d="M64 360a56 56 0 1 0 0 112 56 56 0 1 0 0-112zm0-160a56 56 0 1 0 0 112 56 56 0 1 0 0-112zM120 96A56 56 0 1 0 8 96a56 56 0 1 0 112 0z" />
-                            </svg>
-
-                            <nav className="departmentrole-dot-container">
-                              <div
-                                onClick={() => {
-                                  setEditRole(role);
-                                  setEditRoleOnly(true);
-                                  setShowNewRole(true);
-                                }}
-                              >
-                                Edit
-                              </div>
-
-                              <div onClick={() => deleteRole(role.id)}>
-                                Delete
-                              </div>
-                            </nav>
-                          </td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td colSpan="3">
-                          {editDepartmentRole
-                            ? "No roles found for this department"
-                            : "Save department to add roles"}
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            {/* Submit Buttons */}
-            <div className="create-department-submit-container">
-              <nav>
-                <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setEditDepartmentRole(false);
-                    setShowDepartmentRole(false);
-                    setEditDept({});
-                  }}
-                  className="create-department-cancel"
-                >
-                  Cancel
-                </button>
-
-                <button
-                  type="submit"
-                  className="create-department-save"
-                  disabled={isLoading}
-                >
-                  {isLoading ? "Saving..." : "Save"}
-                </button>
-              </nav>
-            </div>
-          </form>
-        </div>
+      <div className="create-department-head">
+        <p>{editDept?.id ? "Edit" : "Create New"} Department</p>
       </div>
-    </>
+
+      <form onSubmit={handleSubmit}>
+        <div className="create-department-content">
+          <Input id="department_name" label="Department Name" required value={form.department_name} onChange={handleChange} />
+          <Input id="code" label="Code" required value={form.code} onChange={handleChange} />
+        </div>
+
+        <Select id="branch" label="Branch" required value={form.branch} onChange={handleChange} options={branchList} />
+
+        <Input id="description" label="Description" value={form.description} onChange={handleChange} />
+
+        <div className="display-role-cointainer-title">
+          <nav>
+            <p>Roles</p>
+            <button
+              type="button"
+              disabled={!editDept?.id}
+              onClick={() => {
+                setEditRole({});
+                setEditRoleOnly(false);
+                setShowNewRole(true);
+              }}
+            >
+              + Add Role
+            </button>
+            <button
+            onClick={() => {
+              console.log("ADD ROLE CLICKED");
+              setShowNewRole(true);
+            }}
+          >
+            Add Role
+          </button>
+          </nav>
+        </div>
+
+        <div className="display-role-cointainer">{renderRolesUI()}</div>
+
+        <div className="create-department-submit-container">
+          <button type="button" className="create-department-cancel" onClick={onClose}>
+            Cancel
+          </button>
+          <button type="submit" className="create-department-save" disabled={isLoading}>
+            {isLoading ? "Saving..." : "Save"}
+          </button>
+        </div>
+      </form>
+    </div>
   );
 }
+
+/* HELPERS */
+const Input = ({ label, id, ...props }) => (
+  <div className="create-department-box">
+    <label htmlFor={id}>
+      {label} {props.required && <sup>*</sup>}
+    </label>
+    <input id={id} {...props} />
+  </div>
+);
+
+const Select = ({ label, id, options, ...props }) => (
+  <div className="create-department-box" id="create-department-box-fullwidth">
+    <label htmlFor={id}>
+      {label} {props.required && <sup>*</sup>}
+    </label>
+    <select id={id} {...props}>
+      <option value="">Select {label}</option>
+      {options.map((o) => (
+        <option key={o.id} value={o.id}>
+          {o.name}
+        </option>
+      ))}
+    </select>
+  </div>
+);

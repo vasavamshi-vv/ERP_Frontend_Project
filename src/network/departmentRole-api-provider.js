@@ -80,6 +80,22 @@ class DepartmentRoleApiProvider {
       return false;
     }
   }
+
+   async fetchBranches() {
+    try {
+      console.log("Fetching branches with page:");
+
+      const res = await ApiClient.get("/masters/branches/");
+
+      if (res.status === 200) return res.data;
+
+      toast.error("Failed to load branches");
+      return { branches: [] };
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Error loading branches");
+      return { branches: [] };
+    }
+  }
 }
 
 const departmentRoleApiProvider = new DepartmentRoleApiProvider();

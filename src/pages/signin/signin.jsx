@@ -137,12 +137,12 @@ const onSubmit = async (values) => {
               {loading ? "Signing In..." : "Sign In"}
             </button>
 
-            <div id="changer-link">
+            {/* <div id="changer-link">
               Don’t have an account?{" "}
               <Link to="/sign-up" className="link">
                 Sign Up
               </Link>
-            </div>
+            </div> */}
           </form>
 
         </div>
