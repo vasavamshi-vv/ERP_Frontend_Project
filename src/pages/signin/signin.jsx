@@ -31,37 +31,21 @@ export default function Signin() {
       password: ""
     }
   });
+const showErrorToast = (msg) => {
+  if (toast.isActive("login-error")) {
+    toast.update("login-error", {
+      render: msg,
+      type: "error",
+      autoClose: 7000,
+    });
+  } else {
+    toast.error(msg, {
+      toastId: "login-error",
+      autoClose: 7000,
+    });
+  }
+};
 
-  // const onSubmit = async (values) => {
-  //   setLoading(true);
-  //   try {
-  //     const response = await ApiClient.post("/login/", {
-  //       email: values.email,
-  //       password: values.password,
-  //     });
-  //     const data = response.data;
-
-  //     if (data?.token) {
-  //       localStorage.setItem("token", data.token);
-  //       localStorage.setItem("user", JSON.stringify(data.user || { email: values.email }));
-
-  //       toast.success("Signed in successfully!");
-  //       navigate("/dashboard", { replace: true });        console.log("dashboard")
-        
-  //     } else {
-  //       toast.error(data?.detail || "Invalid email or password");
-  //     }
-  //   } catch (error) {
-  //     console.error("Login error:", error);
-  //     const errMsg = error?.response?.data?.detail
-  //       || error?.response?.data?.message
-  //       || "Something went wrong. Please try again later.";
-  //     toast.error(errMsg);
-  //   } finally {
-  //     setLoading(false);
-  //     reset();
-  //   }
-  // };
 const onSubmit = async (values) => {
   setLoading(true);
   try {
@@ -69,8 +53,8 @@ const onSubmit = async (values) => {
       email: values.email,
       password: values.password,
     });
+    console.log(response)
     const data = response.data;
-
     if (data?.token) {
       const cleanToken = data.token.replace(/^token\s+/i, "");
       localStorage.setItem("token", cleanToken);
@@ -83,15 +67,16 @@ const onSubmit = async (values) => {
       navigate("/dashboard", { replace: true });
       reset();
     } else {
-      toast.error(data?.detail || "Invalid email or password");
+      toast.error("Invalid email or password");
     }
   } catch (error) {
-    const errMsg =
-      error?.response?.data?.detail ||
-      error?.response?.data?.message ||
-      "Something went wrong. Please try again later.";
-    toast.error(errMsg);
-  } finally {
+      if (error?.response?.status === 401) {
+        showErrorToast("Invalid email or password");
+      } else {
+        showErrorToast("Something went wrong. Please try again later.");
+      }
+    }
+ finally {
     setLoading(false);
   }
 };
@@ -125,6 +110,9 @@ const onSubmit = async (values) => {
                 placeholder="Password"
                 className="password"
                 {...register("password")}
+                onCopy={(e) => e.preventDefault()}
+                onCut={(e) => e.preventDefault()}
+                onPaste={(e) => e.preventDefault()}
               />
               <EyeToggle
                 show={showPassword}

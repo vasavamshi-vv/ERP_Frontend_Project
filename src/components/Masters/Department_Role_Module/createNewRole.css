@@ -1,9 +1,34 @@
-.create-newrole-cointainer {
+/* .create-newrole-cointainer {
   width: 100%;
   height: 100%;
   padding: 20px;
   overflow: scroll;
+} */
+.create-role-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 9998;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
+
+.create-newrole-cointainer {
+  width: 70%;
+  max-width: 900px;
+  max-height: 90vh;
+
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+
+  overflow-y: auto;
+  z-index: 9999;
+}
+
+
 .create-newrole-cointainer::-webkit-scrollbar {
   display: none;
 }
@@ -181,6 +206,13 @@
     width: 100%;
   }
 }
+@media (max-width: 768px) {
+  .create-newrole-cointainer {
+    width: 95%;
+    max-height: 95vh;
+  }
+}
+
 @media (max-width: 465px) {
   .create-role-cancel {
     padding: 5px 20px;

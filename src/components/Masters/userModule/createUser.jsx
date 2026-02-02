@@ -340,6 +340,7 @@ export default function CreateUser({
   showCreateUser,
   editCreateUser,
   edituser,
+  fetchUsers,
   onClose, // ✅ parent-controlled close
 }) {
   const initialForm = {
@@ -356,6 +357,7 @@ export default function CreateUser({
   };
 
   const [createUserForm, setcreateUserForm] = useState(initialForm);
+  const [reportingUsers, setReportingUsers] = useState([]);
   const [branchList, setBranchList] = useState([]);
   const [departmentList, setDepartmentList] = useState([]);
   const [roleList, setRoleList] = useState([]);
@@ -389,6 +391,20 @@ export default function CreateUser({
       : "",
   });
 }, [edituser, editCreateUser]);
+
+useEffect(() => {
+  const loadReportingUsers = async () => {
+    try {
+      const res = await userApiProvider.fetchUsers(1, "");
+      setReportingUsers(res?.users || []);
+    } catch (err) {
+      setReportingUsers([]);
+    }
+  };
+
+  loadReportingUsers();
+}, []);
+
 
   // =============================================
   // Fetch dropdown data
@@ -480,6 +496,7 @@ export default function CreateUser({
     if (response) {
       toast.success(editCreateUser ? "User updated" : "User created");
       onClose(); // ✅ close modal correctly
+      await fetchUsers(); 
     }
   };
 
@@ -592,12 +609,25 @@ export default function CreateUser({
               }))}
             />
 
-            <Input
+            {/* <Input
               label="Reporting To"
               id="reporting_to"
               value={createUserForm.reporting_to}
               placeholder="Enter Reporting Manager"
               onChange={handleFormChange}
+            /> */}
+            <Select
+              label="Reporting To"
+              id="reporting_to"
+              value={createUserForm.reporting_to}
+              onChange={handleFormChange}
+              options={reportingUsers
+                .filter((u) => u.id !== edituser?.id) // prevent self-reporting
+                .map((u) => ({
+                  id: u.id,
+                  name: `${u.first_name} ${u.last_name} (${u.email})`,
+                }))
+              }
             />
           </div>
 
