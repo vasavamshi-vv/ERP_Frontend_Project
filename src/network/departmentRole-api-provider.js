@@ -81,6 +81,25 @@ class DepartmentRoleApiProvider {
     }
   }
 
+   async fetchRoles(departmentId = null) {
+    try {
+      const url = departmentId
+        ? `/masters/departments/${departmentId}/`
+        : `/masters/departments/`;
+
+      const res = await ApiClient.get(url);
+
+      if (res.status === 200) return res.data.roles ?? res.data;
+
+      toast.error("Failed to load roles");
+      return [];
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Error loading roles");
+      return [];
+    }
+  }
+
+
    async fetchBranches() {
     try {
       console.log("Fetching branches with page:");
