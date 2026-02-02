@@ -19,9 +19,13 @@ class UserApiProvider {
     }
   }
 
-  async fetchDepartments() {
+  async fetchDepartments(branchId = null) {
     try {
-      const res = await ApiClient.get("/masters/departments/");
+       const url = branchId
+        ? `/masters/departments/?branch=${branchId}`
+        : `/masters/departments/`;
+      // const res = await ApiClient.get("/masters/departments/?branch=${branchId}");
+      const res = await ApiClient.get(url);
       if (res.status === 200) return res.data.departments ?? [];
 
       toast.error("Failed to load departments");
